@@ -1,0 +1,147 @@
+<div class="ffrpg4e-sheet">
+  <header class="sheet-header">
+    <img class="portrait" src="{{item.img}}" data-edit="img" alt="{{item.name}}">
+    <div class="identity">
+      <input class="name" name="name" type="text" value="{{item.name}}">
+      <div class="line">
+        <label>Source</label>
+        <input name="system.source" type="text" value="{{system.source}}">
+      </div>
+    </div>
+    <div class="sheet-actions">
+      {{#if isAbility}}<button type="button" data-action="roll-item">Roll</button>{{/if}}
+      {{#if isSpell}}<button type="button" data-action="roll-item">Cast</button>{{/if}}
+      {{#if isEquipment}}<button type="button" data-action="roll-item">Use</button>{{/if}}
+    </div>
+  </header>
+  {{#if isJob}}
+  <section class="panel">
+    <h2>Job</h2>
+    <label>Key</label>
+    <input name="system.key" type="text" value="{{system.key}}">
+    <label>Category</label>
+    <select name="system.category">
+      <option value=""></option>
+      {{#each categoryOptions as |category|}}
+      <option value="{{category.key}}" {{#if category.selected}}selected{{/if}}>{{category.label}}</option>
+      {{/each}}
+    </select>
+    <label>Summary</label>
+    <input name="system.summary" type="text" value="{{system.summary}}">
+    <div class="grid two">
+      <label>HP Bonus<input name="system.hpBonus" type="number" value="{{system.hpBonus}}"></label>
+      <label>MP Bonus<input name="system.mpBonus" type="number" value="{{system.mpBonus}}"></label>
+    </div>
+    <div class="grid two">
+      <label>Primary Stat<select name="system.stat">{{#each statOptions as |stat|}}<option value="{{stat.key}}" {{#if stat.selected}}selected{{/if}}>{{stat.label}}</option>{{/each}}</select></label>
+      <label>Weapon Stat<select name="system.weaponStat">{{#each weaponStatOptions as |stat|}}<option value="{{stat.key}}" {{#if stat.selected}}selected{{/if}}>{{stat.label}}</option>{{/each}}</select></label>
+    </div>
+    <label>Defense Stat<select name="system.defenseStat">{{#each defenseStatOptions as |stat|}}<option value="{{stat.key}}" {{#if stat.selected}}selected{{/if}}>{{stat.label}}</option>{{/each}}</select></label>
+  </section>
+  {{/if}}
+  {{#if isAbility}}
+  <section class="panel">
+    <h2>Ability</h2>
+    <label>Job</label>
+    <select name="system.job">
+      <option value=""></option>
+      {{#each jobOptions as |job|}}
+      <option value="{{job.key}}" {{#if job.selected}}selected{{/if}}>{{job.label}}</option>
+      {{/each}}
+    </select>
+    <div class="grid two">
+      <label>Action Type<select name="system.actionType">{{#each actionTypeOptions as |actionType|}}<option value="{{actionType.key}}" {{#if actionType.selected}}selected{{/if}}>{{actionType.label}}</option>{{/each}}</select></label>
+      <label>Speed<input name="system.speed" type="number" value="{{system.speed}}" min="0"></label>
+    </div>
+    <div class="grid two">
+      <label>MP Cost<input name="system.mpCost" type="number" value="{{system.mpCost}}" min="0"></label>
+      <label>HP Cost<input name="system.hpCost" type="number" value="{{system.hpCost}}" min="0"></label>
+    </div>
+    <div class="grid two">
+      <label>Offensive Stat<select name="system.offensiveStat">{{#each offensiveStatOptions as |stat|}}<option value="{{stat.key}}" {{#if stat.selected}}selected{{/if}}>{{stat.label}}</option>{{/each}}</select></label>
+      <label>Defensive Stat<select name="system.defensiveStat">{{#each defensiveStatOptions as |stat|}}<option value="{{stat.key}}" {{#if stat.selected}}selected{{/if}}>{{stat.label}}</option>{{/each}}</select></label>
+    </div>
+    <label>Effect<select name="system.effect">{{#each effectOptions as |effect|}}<option value="{{effect.key}}" {{#if effect.selected}}selected{{/if}}>{{effect.label}}</option>{{/each}}</select></label>
+    <div class="grid two">
+      <label>Difficulty<input name="system.difficulty" type="number" value="{{system.difficulty}}" min="0"></label>
+      <label>Damage Factor<input name="system.damageFactor" type="number" value="{{system.damageFactor}}" min="0" step="0.25"></label>
+    </div>
+    <div class="grid two">
+      <label>Damage Stat<select name="system.damageStat">{{#each damageStatOptions as |stat|}}<option value="{{stat.key}}" {{#if stat.selected}}selected{{/if}}>{{stat.label}}</option>{{/each}}</select></label>
+      <label>Damage Type<select name="system.damageType">{{#each damageTypeOptions as |damageType|}}<option value="{{damageType.key}}" {{#if damageType.selected}}selected{{/if}}>{{damageType.label}}</option>{{/each}}</select></label>
+    </div>
+    <label>Element<select name="system.element">{{#each elementOptions as |element|}}<option value="{{element.key}}" {{#if element.selected}}selected{{/if}}>{{element.label}}</option>{{/each}}</select></label>
+  </section>
+  {{/if}}
+  {{#if isSpell}}
+  <section class="panel">
+    <h2>Spell</h2>
+    <label>Job</label>
+    <select name="system.job">
+      <option value=""></option>
+      {{#each jobOptions as |job|}}
+      <option value="{{job.key}}" {{#if job.selected}}selected{{/if}}>{{job.label}}</option>
+      {{/each}}
+    </select>
+    <div class="grid two">
+      <label>Action Type<select name="system.actionType">{{#each actionTypeOptions as |actionType|}}<option value="{{actionType.key}}" {{#if actionType.selected}}selected{{/if}}>{{actionType.label}}</option>{{/each}}</select></label>
+      <label>Speed<input name="system.speed" type="number" value="{{system.speed}}" min="0"></label>
+    </div>
+    <div class="grid two">
+      <label>MP Cost<input name="system.mpCost" type="number" value="{{system.mpCost}}" min="0"></label>
+      <label>HP Cost<input name="system.hpCost" type="number" value="{{system.hpCost}}" min="0"></label>
+    </div>
+    <div class="grid two">
+      <label>Offensive Stat<select name="system.offensiveStat">{{#each offensiveStatOptions as |stat|}}<option value="{{stat.key}}" {{#if stat.selected}}selected{{/if}}>{{stat.label}}</option>{{/each}}</select></label>
+      <label>Defensive Stat<select name="system.defensiveStat">{{#each defensiveStatOptions as |stat|}}<option value="{{stat.key}}" {{#if stat.selected}}selected{{/if}}>{{stat.label}}</option>{{/each}}</select></label>
+    </div>
+    <label>Effect<select name="system.effect">{{#each effectOptions as |effect|}}<option value="{{effect.key}}" {{#if effect.selected}}selected{{/if}}>{{effect.label}}</option>{{/each}}</select></label>
+    <div class="grid two">
+      <label>Difficulty<input name="system.difficulty" type="number" value="{{system.difficulty}}" min="0"></label>
+      <label>Damage Factor<input name="system.damageFactor" type="number" value="{{system.damageFactor}}" min="0" step="0.25"></label>
+    </div>
+    <div class="grid two">
+      <label>Damage Stat<select name="system.damageStat">{{#each damageStatOptions as |stat|}}<option value="{{stat.key}}" {{#if stat.selected}}selected{{/if}}>{{stat.label}}</option>{{/each}}</select></label>
+      <label>Damage Type<select name="system.damageType">{{#each damageTypeOptions as |damageType|}}<option value="{{damageType.key}}" {{#if damageType.selected}}selected{{/if}}>{{damageType.label}}</option>{{/each}}</select></label>
+    </div>
+    <label>Element<select name="system.element">{{#each elementOptions as |element|}}<option value="{{element.key}}" {{#if element.selected}}selected{{/if}}>{{element.label}}</option>{{/each}}</select></label>
+  </section>
+  {{/if}}
+  {{#if isEquipment}}
+  <section class="panel">
+    <h2>Equipment</h2>
+    <div class="grid two">
+      <label>Slot<select name="system.slot">{{#each equipmentSlotOptions as |slot|}}<option value="{{slot.key}}" {{#if slot.selected}}selected{{/if}}>{{slot.label}}</option>{{/each}}</select></label>
+      <label>Equipped<input name="system.equipped" type="checkbox" {{#if system.equipped}}checked{{/if}}></label>
+    </div>
+    <div class="grid two">
+      <label>Level<input name="system.level" type="number" value="{{system.level}}" min="1"></label>
+      <label>Gil Cost<input name="system.cost" type="number" value="{{system.cost}}" min="0"></label>
+    </div>
+    <div class="grid two">
+      <label>ARM<input name="system.arm" type="number" value="{{system.arm}}" min="0"></label>
+      <label>MARM<input name="system.marm" type="number" value="{{system.marm}}" min="0"></label>
+    </div>
+    <div class="grid two">
+      <label>Offensive Stat<select name="system.offensiveStat">{{#each offensiveStatOptions as |stat|}}<option value="{{stat.key}}" {{#if stat.selected}}selected{{/if}}>{{stat.label}}</option>{{/each}}</select></label>
+      <label>Defensive Stat<select name="system.defensiveStat">{{#each defensiveStatOptions as |stat|}}<option value="{{stat.key}}" {{#if stat.selected}}selected{{/if}}>{{stat.label}}</option>{{/each}}</select></label>
+    </div>
+    <div class="grid two">
+      <label>Damage Stat<select name="system.damageStat">{{#each damageStatOptions as |stat|}}<option value="{{stat.key}}" {{#if stat.selected}}selected{{/if}}>{{stat.label}}</option>{{/each}}</select></label>
+      <label>Difficulty<input name="system.difficulty" type="number" value="{{system.difficulty}}" min="0"></label>
+    </div>
+    <label>Effect<select name="system.effect">{{#each effectOptions as |effect|}}<option value="{{effect.key}}" {{#if effect.selected}}selected{{/if}}>{{effect.label}}</option>{{/each}}</select></label>
+    <div class="grid two">
+      <label>Damage Factor<input name="system.damageFactor" type="number" value="{{system.damageFactor}}" min="0" step="0.25"></label>
+      <label>Damage Type<select name="system.damageType">{{#each damageTypeOptions as |damageType|}}<option value="{{damageType.key}}" {{#if damageType.selected}}selected{{/if}}>{{damageType.label}}</option>{{/each}}</select></label>
+    </div>
+    <label>Element<select name="system.element">{{#each elementOptions as |element|}}<option value="{{element.key}}" {{#if element.selected}}selected{{/if}}>{{element.label}}</option>{{/each}}</select></label>
+    <label>Bonus</label>
+    <input name="system.bonus" type="text" value="{{system.bonus}}">
+  </section>
+  {{/if}}
+  <section class="panel">
+    <h2>Description</h2>
+    <textarea name="system.description" rows="10">{{system.description}}</textarea>
+  </section>
+</div>

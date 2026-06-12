@@ -1,0 +1,156 @@
+<div class="ffrpg4e-sheet">
+  <header class="sheet-header">
+    <img class="portrait" src="{{actor.img}}" data-edit="img" alt="{{actor.name}}">
+    <div class="identity">
+      <input class="name" name="name" type="text" value="{{actor.name}}">
+      <div class="line">
+        <label>Level</label>
+        <input type="number" value="{{derived.level}}" disabled>
+      </div>
+      <div class="line">
+        <label>Gil</label>
+        <input name="system.gil" type="number" value="{{system.gil}}" min="0">
+      </div>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" data-action="roll-initiative">Initiative</button>
+      <button type="button" data-action="basic-attack">Attack</button>
+    </div>
+  </header>
+  <section class="grid two">
+    <div class="panel">
+      <h2>Jobs</h2>
+      <label>Primary</label>
+      <select name="system.jobs.primary">
+        <option value=""></option>
+        {{#each jobOptions as |job|}}
+        <option value="{{job.key}}" {{#if job.selectedPrimary}}selected{{/if}}>{{job.label}} - {{job.categoryLabel}}</option>
+        {{/each}}
+      </select>
+      <label>Secondary</label>
+      <select name="system.jobs.secondary">
+        <option value=""></option>
+        {{#each jobOptions as |job|}}
+        <option value="{{job.key}}" {{#if job.selectedSecondary}}selected{{/if}}>{{job.label}} - {{job.categoryLabel}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="panel">
+      <h2>Resources</h2>
+      <div class="resources">
+        <label>HP</label>
+        <input name="system.resources.hp.value" type="number" value="{{system.resources.hp.value}}" min="0">
+        <span>/</span>
+        <input name="system.resources.hp.max" type="number" value="{{system.resources.hp.max}}" min="0">
+        <label>MP</label>
+        <input name="system.resources.mp.value" type="number" value="{{system.resources.mp.value}}" min="0">
+        <span>/</span>
+        <input name="system.resources.mp.max" type="number" value="{{system.resources.mp.max}}" min="0">
+      </div>
+      <div class="resource-suggestion">
+        Suggested HP {{derived.hpMax}}, MP {{derived.mpMax}}
+        <button type="button" data-action="apply-job-resources">Apply</button>
+      </div>
+    </div>
+  </section>
+  <section class="grid two">
+    <div class="panel">
+      <h2>Stats</h2>
+      <div class="stats-grid">
+        {{#each statEntries as |stat|}}
+        <label>{{stat.label}}<input name="system.stats.{{stat.key}}.value" type="number" value="{{stat.value}}" min="0" max="255"></label>
+        <div class="stat-level">Lv {{stat.level}}</div>
+        {{/each}}
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Defense</h2>
+      <div class="resources">
+        <label>ARM</label>
+        <input name="system.combat.arm" type="number" value="{{system.combat.arm}}" min="0">
+        <span>=</span>
+        <input type="number" value="{{derived.arm}}" disabled>
+        <label>MARM</label>
+        <input name="system.combat.marm" type="number" value="{{system.combat.marm}}" min="0">
+        <span>=</span>
+        <input type="number" value="{{derived.marm}}" disabled>
+      </div>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Challenge</h2>
+    <div class="challenge-row">
+      <select name="roll.skill">
+        {{#each skillOptions as |skill|}}
+        <option value="{{skill.key}}">{{skill.label}} ({{skill.statLabel}} {{skill.value}})</option>
+        {{/each}}
+      </select>
+      <input name="roll.difficulty" type="number" value="30" min="1" max="99">
+      <button type="button" data-action="roll-challenge">Roll</button>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Skills</h2>
+    <div class="skills-grid">
+      {{#each skillOptions as |skill|}}
+      <label>{{skill.label}}<input name="system.skills.{{skill.key}}" type="number" value="{{skill.value}}" min="0"></label>
+      {{/each}}
+    </div>
+  </section>
+  <section class="grid two">
+    <div class="panel item-list">
+      <h2>Abilities</h2>
+      {{#each items.abilities as |item|}}
+      <div class="item-row">
+        <span>{{item.name}}</span>
+        <button type="button" data-action="roll-item" data-item-id="{{item.id}}">Roll</button>
+      </div>
+      {{/each}}
+    </div>
+    <div class="panel item-list">
+      <h2>Spells</h2>
+      {{#each items.spells as |item|}}
+      <div class="item-row">
+        <span>{{item.name}}</span>
+        <button type="button" data-action="roll-item" data-item-id="{{item.id}}">Cast</button>
+      </div>
+      {{/each}}
+    </div>
+  </section>
+  <section class="panel item-list">
+    <h2>Equipment</h2>
+    {{#each items.equipment as |item|}}
+    <div class="item-row">
+      <span>{{item.name}} ({{item.system.slot}})</span>
+      <button type="button" data-action="toggle-equipped" data-item-id="{{item.id}}">{{#if item.system.equipped}}Unequip{{else}}Equip{{/if}}</button>
+      {{#if item.system.equipped}}
+      <button type="button" data-action="roll-item" data-item-id="{{item.id}}">Use</button>
+      {{/if}}
+    </div>
+    {{/each}}
+  </section>
+  <section class="panel jobs-list">
+    <h2>Homebrew Class List</h2>
+    {{#each categories as |category|}}
+    <div class="category">
+      <h3>{{category.label}}</h3>
+      <div class="cards">
+        {{#each category.jobs as |job|}}
+        <div class="job-card">
+          <strong>{{job.label}}</strong>
+          <span>{{job.summary}}</span>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    {{/each}}
+  </section>
+  <section class="panel">
+    <h2>Status Effects</h2>
+    <textarea name="system.combat.statuses" rows="4">{{system.combat.statuses}}</textarea>
+  </section>
+  <section class="panel">
+    <h2>Biography</h2>
+    <textarea name="system.biography" rows="8">{{system.biography}}</textarea>
+  </section>
+</div>

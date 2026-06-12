@@ -1,0 +1,75 @@
+{
+  "id": "ffrpg4e-homebrew-foundry",
+  "title": "FFRPG 4e Homebrew",
+  "description": "A homebrew Final Fantasy RPG 4e system for Foundry Virtual Tabletop.",
+  "version": "0.2.2",
+  "compatibility": {
+    "minimum": 14,
+    "verified": 14
+  },
+  "authors": [
+    {
+      "name": "soraw"
+    }
+  ],
+  "esmodules": [
+    "ffrpg4e-homebrew-foundry.mjs"
+  ],
+  "styles": [
+    "styles/ffrpg4e.css"
+  ],
+  "url": "https://github.com/Pixako-Unrealistia/FFRPG4e-homebrew-foundry",
+  "manifest": "https://raw.githubusercontent.com/Pixako-Unrealistia/FFRPG4e-homebrew-foundry/main/system.json",
+  "download": "https://github.com/Pixako-Unrealistia/FFRPG4e-homebrew-foundry/archive/refs/heads/main.zip",
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "documentTypes": {
+    "Actor": {
+      "character": {
+        "htmlFields": [
+          "biography"
+        ]
+      },
+      "npc": {
+        "htmlFields": [
+          "biography"
+        ]
+      }
+    },
+    "Item": {
+      "job": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "ability": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "spell": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "equipment": {
+        "htmlFields": [
+          "description"
+        ]
+      }
+    }
+  },
+  "socket": false,
+  "initiative": "3d10",
+  "grid": {
+    "distance": 1,
+    "units": "sq"
+  },
+  "primaryTokenAttribute": "resources.hp",
+  "secondaryTokenAttribute": "resources.mp"
+}
