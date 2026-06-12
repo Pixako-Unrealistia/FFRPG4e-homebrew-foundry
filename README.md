@@ -6,7 +6,7 @@ Changes are made to specifically tailor for final fantasy 6 content.
 
 ## Status
 
-- System version: `0.2.2`
+- System version: `0.3.0`
 - Foundry target: v14
 - Latest Foundry release checked during setup: v14 build 364, June 10, 2026
 - System id: `ffrpg4e-homebrew-foundry`
@@ -24,11 +24,26 @@ Download URL:
 
 The manifest install works after this repo is pushed and available to Foundry.
 
+## Compendium Packs
+
+The system ships multiple compendium packs:
+
+- `Homebrew Jobs`: 33 Item documents
+- `Homebrew Abilities`: 99 Item documents
+- `FF6 Spells`: 76 Item documents
+- `FF6 Equipment`: 132 Item documents
+- `FF6 Playable Characters`: 14 Actor documents
+- `FF6 Guests And Story Characters`: 22 Actor documents
+- `FF6 Enemies`: 275 Actor documents
+- `FF6 Bosses`: 110 Actor documents
+
+Total compendium documents: 761
+
 ## Seeded Content
 
 On first GM load in a world, the system creates or updates a folder named `FFRPG 4e Homebrew Content`.
 
-Seed version: `0.2.2`
+Seed version: `0.3.0`
 
 Seeded item count:
 
