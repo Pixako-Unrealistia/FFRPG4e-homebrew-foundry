@@ -1,7 +1,17 @@
 import { FFRPG4E } from "./config.mjs";
 
-export const CONTENT_VERSION = "0.2.2";
+export const CONTENT_VERSION = "0.3.0";
 const SYSTEM_ID = "ffrpg4e-homebrew-foundry";
+const PACK_SOURCES = [
+  { name: "Homebrew Jobs", type: "Item", path: "packs/homebrew-jobs.db" },
+  { name: "Homebrew Abilities", type: "Item", path: "packs/homebrew-abilities.db" },
+  { name: "FF6 Spells", type: "Item", path: "packs/ff6-spells.db" },
+  { name: "FF6 Equipment", type: "Item", path: "packs/ff6-equipment.db" },
+  { name: "FF6 Playable Characters", type: "Actor", path: "packs/ff6-playable-characters.db" },
+  { name: "FF6 Guests And Story Characters", type: "Actor", path: "packs/ff6-guests.db" },
+  { name: "FF6 Enemies", type: "Actor", path: "packs/ff6-enemies.db" },
+  { name: "FF6 Bosses", type: "Actor", path: "packs/ff6-bosses.db" }
+];
 
 const abilityProfiles = {
   warrior: ["Power Break", "Armor Break", "Cleave"],
@@ -376,17 +386,34 @@ function makeEquipmentItems() {
   }));
 }
 
-export function registerContentSettings() {
+export function registerContentSettings(menuClass) {
   game.settings.register(SYSTEM_ID, "contentVersion", {
     scope: "world",
     config: false,
     type: String,
     default: ""
   });
+  game.settings.registerMenu(SYSTEM_ID, "contentImporter", {
+    name: "FFRPG 4e Content Importer",
+    label: "Import Content",
+    hint: "Create or update homebrew and FF6 source content in this world.",
+    icon: "fa-solid fa-file-import",
+    type: menuClass,
+    restricted: true
+  });
 }
 
 export function buildWorldContent() {
   return [...makeJobItems(), ...makeAbilityItems(), ...makeSpellItems(), ...makeEquipmentItems()];
+}
+
+export async function getPackSourceCounts() {
+  const counts = {};
+  for (const pack of PACK_SOURCES) {
+    const documents = await loadPackSource(pack);
+    counts[pack.name] = documents.length;
+  }
+  return counts;
 }
 
 async function getContentFolder() {
@@ -395,24 +422,92 @@ async function getContentFolder() {
   return Folder.create({ name: "FFRPG 4e Homebrew Content", type: "Item" });
 }
 
-export async function seedWorldContent() {
+export async function seedWorldContent(options = {}) {
   if (!game.user.isGM) return;
   const current = game.settings.get(SYSTEM_ID, "contentVersion");
-  if (current === CONTENT_VERSION) return;
+  if (current === CONTENT_VERSION && !options.force) return;
   const folder = await getContentFolder();
   const items = buildWorldContent();
   const createData = [];
+  let updated = 0;
   for (const data of items) {
     data.folder = folder.id;
     const key = data.flags[SYSTEM_ID].seedKey;
     const existing = game.items.find((item) => item.getFlag(SYSTEM_ID, "seedKey") === key);
     if (existing) {
       await existing.update(data);
+      updated += 1;
     } else {
       createData.push(data);
     }
   }
   if (createData.length > 0) await Item.createDocuments(createData);
   await game.settings.set(SYSTEM_ID, "contentVersion", CONTENT_VERSION);
-  ui.notifications.info(`Seeded ${items.length} FFRPG 4e homebrew items.`);
+  ui.notifications.info(`Imported ${items.length} FFRPG 4e homebrew items.`);
+  return {
+    total: items.length,
+    created: createData.length,
+    updated
+  };
+}
+
+async function getNamedFolder(name, type) {
+  const existing = game.folders.find((folder) => folder.type === type && folder.name === name);
+  if (existing) return existing;
+  return Folder.create({ name, type });
+}
+
+async function loadPackSource(pack) {
+  const response = await fetch(`systems/${SYSTEM_ID}/${pack.path}`);
+  const text = await response.text();
+  return text.trim().split("\n").filter((line) => line.trim()).map((line) => JSON.parse(line));
+}
+
+function cloneDocumentData(data, folderId) {
+  const clone = foundry.utils.deepClone(data);
+  clone.folder = folderId;
+  return clone;
+}
+
+async function upsertDocuments(type, documents, folderId) {
+  const collection = type === "Actor" ? game.actors : game.items;
+  const documentClass = type === "Actor" ? Actor : Item;
+  const createData = [];
+  let updated = 0;
+  for (const data of documents) {
+    const sourceKey = data.flags[SYSTEM_ID].sourceKey;
+    const existing = collection.find((document) => document.getFlag(SYSTEM_ID, "sourceKey") === sourceKey);
+    const clone = cloneDocumentData(data, folderId);
+    if (existing) {
+      delete clone._id;
+      await existing.update(clone);
+      updated += 1;
+    } else {
+      createData.push(clone);
+    }
+  }
+  if (createData.length > 0) await documentClass.createDocuments(createData);
+  return {
+    created: createData.length,
+    updated
+  };
+}
+
+export async function importPackSourcesToWorld() {
+  if (!game.user.isGM) return;
+  const result = {};
+  let total = 0;
+  for (const pack of PACK_SOURCES) {
+    const folder = await getNamedFolder(pack.name, pack.type);
+    const documents = await loadPackSource(pack);
+    const imported = await upsertDocuments(pack.type, documents, folder.id);
+    result[pack.name] = {
+      total: documents.length,
+      created: imported.created,
+      updated: imported.updated
+    };
+    total += documents.length;
+  }
+  ui.notifications.info(`Imported ${total} FFRPG 4e compendium source documents.`);
+  return result;
 }

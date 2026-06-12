@@ -1,4 +1,5 @@
 import { FFRPG4E } from "./module/config.mjs";
+import { FFRPGContentImporter } from "./module/apps/content-importer.mjs";
 import { registerContentSettings, seedWorldContent } from "./module/content.mjs";
 import { CharacterDataModel, NpcDataModel, JobDataModel, AbilityDataModel, SpellDataModel, EquipmentDataModel } from "./module/data-models.mjs";
 import { FFRPGActor, FFRPGItem } from "./module/documents.mjs";
@@ -6,7 +7,7 @@ import { FFRPGActorSheet } from "./module/sheets/actor-sheet.mjs";
 import { FFRPGItemSheet } from "./module/sheets/item-sheet.mjs";
 
 Hooks.once("init", () => {
-  registerContentSettings();
+  registerContentSettings(FFRPGContentImporter);
   CONFIG.FFRPG4E = FFRPG4E;
   CONFIG.Actor.documentClass = FFRPGActor;
   CONFIG.Item.documentClass = FFRPGItem;

@@ -1,0 +1,34 @@
+<section class="ffrpg4e-importer">
+  <h2>World Item Seeds</h2>
+  <dl>
+    <dt>Seed Version</dt>
+    <dd>{{contentVersion}}</dd>
+    <dt>World Version</dt>
+    <dd>{{worldVersion}}</dd>
+    <dt>Total Items</dt>
+    <dd>{{total}}</dd>
+    <dt>Jobs</dt>
+    <dd>{{counts.job}}</dd>
+    <dt>Abilities</dt>
+    <dd>{{counts.ability}}</dd>
+    <dt>Spells</dt>
+    <dd>{{counts.spell}}</dd>
+    <dt>Equipment</dt>
+    <dd>{{counts.equipment}}</dd>
+  </dl>
+  <button type="button" data-action="import-content">
+    <i class="fa-solid fa-file-import"></i>
+    Import / Update Item Seeds
+  </button>
+  <h2>Compendium Source Packs</h2>
+  <dl>
+    {{#each packCounts as |count name|}}
+    <dt>{{name}}</dt>
+    <dd>{{count}}</dd>
+    {{/each}}
+  </dl>
+  <button type="button" data-action="import-packs">
+    <i class="fa-solid fa-file-import"></i>
+    Import / Update All Pack Sources
+  </button>
+</section>

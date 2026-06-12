@@ -2,7 +2,7 @@
   "id": "ffrpg4e-homebrew-foundry",
   "title": "FFRPG 4e Homebrew",
   "description": "A homebrew Final Fantasy RPG 4e system for Foundry Virtual Tabletop.",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "compatibility": {
     "minimum": 14,
     "verified": 14
@@ -64,6 +64,64 @@
       }
     }
   },
+  "packs": [
+    {
+      "name": "homebrew-jobs",
+      "label": "Homebrew Jobs",
+      "path": "packs/homebrew-jobs.db",
+      "type": "Item",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "homebrew-abilities",
+      "label": "Homebrew Abilities",
+      "path": "packs/homebrew-abilities.db",
+      "type": "Item",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-spells",
+      "label": "FF6 Spells",
+      "path": "packs/ff6-spells.db",
+      "type": "Item",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-equipment",
+      "label": "FF6 Equipment",
+      "path": "packs/ff6-equipment.db",
+      "type": "Item",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-playable-characters",
+      "label": "FF6 Playable Characters",
+      "path": "packs/ff6-playable-characters.db",
+      "type": "Actor",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-guests",
+      "label": "FF6 Guests And Story Characters",
+      "path": "packs/ff6-guests.db",
+      "type": "Actor",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-enemies",
+      "label": "FF6 Enemies",
+      "path": "packs/ff6-enemies.db",
+      "type": "Actor",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-bosses",
+      "label": "FF6 Bosses",
+      "path": "packs/ff6-bosses.db",
+      "type": "Actor",
+      "system": "ffrpg4e-homebrew-foundry"
+    }
+  ],
   "socket": false,
   "initiative": "3d10",
   "grid": {

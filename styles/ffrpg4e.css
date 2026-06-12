@@ -212,3 +212,29 @@
 .ffrpg4e-chat dd {
   margin: 0;
 }
+
+.ffrpg4e-importer {
+  display: grid;
+  gap: 12px;
+}
+
+.ffrpg4e-importer h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.ffrpg4e-importer dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 12px;
+  margin: 0;
+}
+
+.ffrpg4e-importer dt {
+  font-weight: 700;
+}
+
+.ffrpg4e-importer dd {
+  margin: 0;
+  text-align: right;
+}
