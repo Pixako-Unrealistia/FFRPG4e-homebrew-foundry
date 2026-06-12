@@ -120,6 +120,34 @@
       "path": "packs/ff6-bosses.db",
       "type": "Actor",
       "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-random-encounters",
+      "label": "FF6 Random Encounters",
+      "path": "packs/ff6-random-encounters.db",
+      "type": "RollTable",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-boss-encounters",
+      "label": "FF6 Boss Encounters",
+      "path": "packs/ff6-boss-encounters.db",
+      "type": "JournalEntry",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-encounter-scenes",
+      "label": "FF6 Encounter Scenes",
+      "path": "packs/ff6-encounter-scenes.db",
+      "type": "Scene",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-loot-tables",
+      "label": "FF6 Loot Tables",
+      "path": "packs/ff6-loot-tables.db",
+      "type": "RollTable",
+      "system": "ffrpg4e-homebrew-foundry"
     }
   ],
   "socket": false,

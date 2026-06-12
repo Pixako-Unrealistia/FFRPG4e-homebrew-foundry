@@ -36,8 +36,18 @@ The system ships multiple compendium packs:
 - `FF6 Guests And Story Characters`: 22 Actor documents
 - `FF6 Enemies`: 275 Actor documents
 - `FF6 Bosses`: 110 Actor documents
+- `FF6 Random Encounters`: 24 RollTable documents
+- `FF6 Boss Encounters`: 110 JournalEntry documents
+- `FF6 Encounter Scenes`: 32 Scene documents
+- `FF6 Loot Tables`: 385 RollTable documents
 
-Total compendium documents: 761
+Total compendium documents: 1312
+
+Import path:
+
+`Game Settings > Configure Settings > FFRPG 4e Homebrew > Import Content`
+
+The importer can create or update item seeds and all pack source documents in the current world.
 
 ## Seeded Content
 
@@ -341,3 +351,5 @@ Seeded item count:
 - FF6 Weapons reference: `https://www.cavesofnarshe.com/ff6/weapons.php`
 - FF6 Armor reference: `https://www.cavesofnarshe.com/ff6/armor.php`
 - FF6 Relics reference: `https://www.cavesofnarshe.com/ff6/relics.php`
+- FF6 Bestiary reference: `https://www.cavesofnarshe.com/ff6/enemies.php`
+- FF6 Boss reference: `https://www.cavesofnarshe.com/ff6/enemies.php?type=bosses`
