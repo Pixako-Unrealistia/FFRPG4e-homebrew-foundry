@@ -1,0 +1,214 @@
+.ffrpg4e.sheet {
+  --ff-bg: #f4eedf;
+  --ff-ink: #241f1a;
+  --ff-muted: #746b5e;
+  --ff-line: #c9bda8;
+  --ff-panel: #fffaf0;
+  color: var(--ff-ink);
+}
+
+.ffrpg4e .window-content {
+  background: var(--ff-bg);
+}
+
+.ffrpg4e-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100%;
+}
+
+.ffrpg4e-sheet .sheet-header {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.ffrpg4e-sheet .portrait {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border: 1px solid var(--ff-line);
+}
+
+.ffrpg4e-sheet .identity {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ffrpg4e-sheet .name {
+  height: 42px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.ffrpg4e-sheet .line {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.ffrpg4e-sheet .grid {
+  display: grid;
+  gap: 12px;
+}
+
+.ffrpg4e-sheet .grid.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ffrpg4e-sheet .sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ffrpg4e-sheet .panel {
+  background: var(--ff-panel);
+  border: 1px solid var(--ff-line);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.ffrpg4e-sheet h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.ffrpg4e-sheet h3 {
+  margin: 8px 0;
+  font-size: 14px;
+  color: var(--ff-muted);
+  text-transform: uppercase;
+}
+
+.ffrpg4e-sheet label {
+  display: grid;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.ffrpg4e-sheet input,
+.ffrpg4e-sheet select,
+.ffrpg4e-sheet textarea {
+  width: 100%;
+}
+
+.ffrpg4e-sheet textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.ffrpg4e-sheet .resources {
+  display: grid;
+  grid-template-columns: 48px 1fr 16px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.ffrpg4e-sheet .resource-suggestion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--ff-muted);
+}
+
+.ffrpg4e-sheet .stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 56px;
+  gap: 8px;
+  align-items: end;
+}
+
+.ffrpg4e-sheet .stat-level {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ff-line);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--ff-muted);
+  font-weight: 700;
+}
+
+.ffrpg4e-sheet .skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.ffrpg4e-sheet .challenge-row {
+  display: grid;
+  grid-template-columns: 1fr 96px auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.ffrpg4e-sheet .item-list {
+  display: grid;
+  gap: 8px;
+}
+
+.ffrpg4e-sheet .item-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  min-height: 34px;
+  border-bottom: 1px solid var(--ff-line);
+  padding-bottom: 6px;
+}
+
+.ffrpg4e-sheet .jobs-list {
+  display: grid;
+  gap: 10px;
+}
+
+.ffrpg4e-sheet .cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.ffrpg4e-sheet .job-card {
+  display: grid;
+  gap: 4px;
+  min-height: 56px;
+  border: 1px solid var(--ff-line);
+  border-radius: 6px;
+  padding: 8px;
+  background: #ffffff;
+}
+
+.ffrpg4e-sheet .job-card span {
+  color: var(--ff-muted);
+}
+
+@media (max-width: 720px) {
+  .ffrpg4e-sheet .grid.two,
+  .ffrpg4e-sheet .sheet-header,
+  .ffrpg4e-sheet .challenge-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ffrpg4e-chat dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+}
+
+.ffrpg4e-chat dt {
+  font-weight: 700;
+}
+
+.ffrpg4e-chat dd {
+  margin: 0;
+}

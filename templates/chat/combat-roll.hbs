@@ -1,0 +1,26 @@
+<div class="ffrpg4e-chat">
+  <h2>{{action.name}}</h2>
+  <dl>
+    <dt>Attack</dt>
+    <dd>{{rollTotal}}</dd>
+    <dt>Element</dt>
+    <dd>{{lookup elements data.element}}</dd>
+    <dt>Damage Type</dt>
+    <dd>{{lookup damageTypes data.damageType}}</dd>
+    <dt>Base Damage</dt>
+    <dd>{{baseDamage}}</dd>
+    <dt>Roll Digit</dt>
+    <dd>{{digit}}</dd>
+    <dt>Raw Damage</dt>
+    <dd>{{rawDamage}}</dd>
+  </dl>
+  {{#if targets.length}}
+  <ol>
+    {{#each targets as |target|}}
+    <li>{{target.name}}: {{#if target.hit}}{{#if target.finalHealing}}{{target.finalHealing}} HP restored{{else}}{{#if target.finalDamage}}{{target.finalDamage}} HP lost{{else}}Effect applied{{/if}}{{/if}}{{else}}Miss{{/if}}</li>
+    {{/each}}
+  </ol>
+  {{else}}
+  <p>No targets selected.</p>
+  {{/if}}
+</div>
