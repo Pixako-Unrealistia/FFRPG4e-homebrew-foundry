@@ -2,7 +2,7 @@
   "id": "ffrpg4e-homebrew-foundry",
   "title": "FFRPG 4e Homebrew",
   "description": "A homebrew Final Fantasy RPG 4e system for Foundry Virtual Tabletop.",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "compatibility": {
     "minimum": 14,
     "verified": 14

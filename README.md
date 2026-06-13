@@ -6,7 +6,7 @@ Changes are made to specifically tailor for final fantasy 6 content.
 
 ## Status
 
-- System version: `0.3.9`
+- System version: `0.3.10`
 - Foundry target: v14
 - Latest Foundry release checked during setup: v14 build 364, June 10, 2026
 - System id: `ffrpg4e-homebrew-foundry`

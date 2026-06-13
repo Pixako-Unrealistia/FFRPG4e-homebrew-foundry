@@ -1,6 +1,5 @@
 <div class="ffrpg4e-sheet">
   <header class="sheet-header summary-header">
-    <img class="portrait" src="{{actor.img}}" alt="{{actor.name}}">
     <div class="identity-summary">
       <h1>{{actor.name}}</h1>
       <div class="summary-line">Level {{system.level}} / {{system.gil}} gil</div>
@@ -60,15 +59,44 @@
   </section>
   {{#if canManageItems}}
   <section class="panel">
-    <h2>Add Owned Item</h2>
-    <div class="owned-item-manager">
-      <select name="manage.itemId" data-add-owned-item>
-        <option value=""></option>
-        {{#each availableItems as |item|}}
-        <option value="{{item.id}}">{{item.label}}</option>
-        {{/each}}
-      </select>
-      <button type="button" data-action="add-owned-item">Add</button>
+    <h2>Add Owned</h2>
+    <div class="owned-item-manager-grid">
+      <div class="owned-item-manager">
+        <label>Spell<select name="manage.spellUuid" data-add-owned-item="spell">
+          <option value=""></option>
+          {{#each availableItems.spell as |item|}}
+          <option value="{{item.uuid}}">{{item.label}}</option>
+          {{/each}}
+        </select></label>
+        <button type="button" data-action="add-owned-item" data-item-type="spell">Add Spell</button>
+      </div>
+      <div class="owned-item-manager">
+        <label>Equipment<select name="manage.equipmentUuid" data-add-owned-item="equipment">
+          <option value=""></option>
+          {{#each availableItems.equipment as |item|}}
+          <option value="{{item.uuid}}">{{item.label}}</option>
+          {{/each}}
+        </select></label>
+        <button type="button" data-action="add-owned-item" data-item-type="equipment">Add Item</button>
+      </div>
+      <div class="owned-item-manager">
+        <label>Ability<select name="manage.abilityUuid" data-add-owned-item="ability">
+          <option value=""></option>
+          {{#each availableItems.ability as |item|}}
+          <option value="{{item.uuid}}">{{item.label}}</option>
+          {{/each}}
+        </select></label>
+        <button type="button" data-action="add-owned-item" data-item-type="ability">Add Ability</button>
+      </div>
+      <div class="owned-item-manager">
+        <label>Job<select name="manage.jobUuid" data-add-owned-item="job">
+          <option value=""></option>
+          {{#each availableItems.job as |item|}}
+          <option value="{{item.uuid}}">{{item.label}}</option>
+          {{/each}}
+        </select></label>
+        <button type="button" data-action="add-owned-item" data-item-type="job">Add Job</button>
+      </div>
     </div>
   </section>
   {{/if}}
@@ -80,7 +108,10 @@
         <img src="{{item.img}}" alt="{{item.name}}">
         <span><strong>{{item.name}}</strong><small>{{item.system.actionType}} action</small></span>
         <button type="button" data-action="roll-item" data-item-id="{{item.id}}">{{item.rollLabel}}</button>
+        <span class="item-count">x{{item.quantity}}</span>
         {{#if ../canManageItems}}
+        <button type="button" data-action="decrease-owned-item" data-item-id="{{item.id}}">-</button>
+        <button type="button" data-action="increase-owned-item" data-item-id="{{item.id}}">+</button>
         <button type="button" data-action="remove-owned-item" data-item-id="{{item.id}}">Remove</button>
         {{/if}}
       </div>
@@ -95,7 +126,10 @@
         <img src="{{item.img}}" alt="{{item.name}}">
         <span><strong>{{item.name}}</strong><small>{{item.system.mpCost}} MP, {{item.system.element}}</small></span>
         <button type="button" data-action="roll-item" data-item-id="{{item.id}}">{{item.rollLabel}}</button>
+        <span class="item-count">x{{item.quantity}}</span>
         {{#if ../canManageItems}}
+        <button type="button" data-action="decrease-owned-item" data-item-id="{{item.id}}">-</button>
+        <button type="button" data-action="increase-owned-item" data-item-id="{{item.id}}">+</button>
         <button type="button" data-action="remove-owned-item" data-item-id="{{item.id}}">Remove</button>
         {{/if}}
       </div>
@@ -115,7 +149,10 @@
         {{#if item.canRoll}}
         <button type="button" data-action="roll-item" data-item-id="{{item.id}}">{{item.rollLabel}}</button>
         {{/if}}
+        <span class="item-count">x{{item.quantity}}</span>
         {{#if ../canManageItems}}
+        <button type="button" data-action="decrease-owned-item" data-item-id="{{item.id}}">-</button>
+        <button type="button" data-action="increase-owned-item" data-item-id="{{item.id}}">+</button>
         <button type="button" data-action="remove-owned-item" data-item-id="{{item.id}}">Remove</button>
         {{/if}}
       </div>
@@ -129,7 +166,10 @@
       <div class="item-row">
         <img src="{{item.img}}" alt="{{item.name}}">
         <span><strong>{{item.name}}</strong><small>{{item.typeLabel}}</small></span>
+        <span class="item-count">x{{item.quantity}}</span>
         {{#if ../canManageItems}}
+        <button type="button" data-action="decrease-owned-item" data-item-id="{{item.id}}">-</button>
+        <button type="button" data-action="increase-owned-item" data-item-id="{{item.id}}">+</button>
         <button type="button" data-action="remove-owned-item" data-item-id="{{item.id}}">Remove</button>
         {{/if}}
       </div>
@@ -147,7 +187,10 @@
       {{#if item.canRoll}}
       <button type="button" data-action="roll-item" data-item-id="{{item.id}}">{{item.rollLabel}}</button>
       {{/if}}
+      <span class="item-count">x{{item.quantity}}</span>
       {{#if ../canManageItems}}
+      <button type="button" data-action="decrease-owned-item" data-item-id="{{item.id}}">-</button>
+      <button type="button" data-action="increase-owned-item" data-item-id="{{item.id}}">+</button>
       <button type="button" data-action="remove-owned-item" data-item-id="{{item.id}}">Remove</button>
       {{/if}}
     </div>
@@ -157,18 +200,15 @@
   </section>
   <section class="panel">
     <h2>Edit Identity</h2>
-    <div class="edit-identity">
-      <img class="portrait" src="{{actor.img}}" data-edit="img" alt="{{actor.name}}">
-      <div class="identity">
-        <label>Name<input class="name" name="name" type="text" value="{{actor.name}}"></label>
-        <div class="line">
-          <label>Level</label>
-          <input name="system.level" type="number" value="{{system.level}}" min="1">
-        </div>
-        <div class="line">
-          <label>Gil</label>
-          <input name="system.gil" type="number" value="{{system.gil}}" min="0">
-        </div>
+    <div class="identity">
+      <label>Name<input class="name" name="name" type="text" value="{{actor.name}}"></label>
+      <div class="line">
+        <label>Level</label>
+        <input name="system.level" type="number" value="{{system.level}}" min="1">
+      </div>
+      <div class="line">
+        <label>Gil</label>
+        <input name="system.gil" type="number" value="{{system.gil}}" min="0">
       </div>
     </div>
   </section>

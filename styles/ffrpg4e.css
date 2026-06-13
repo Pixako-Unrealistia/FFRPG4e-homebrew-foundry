@@ -31,7 +31,7 @@
 
 .ffrpg4e-sheet .sheet-header {
   display: grid;
-  grid-template-columns: 96px 1fr auto;
+  grid-template-columns: 1fr auto;
   gap: 12px;
   align-items: center;
 }
@@ -62,7 +62,7 @@
 }
 
 .ffrpg4e-sheet .summary-line {
-  color: var(--ff-muted);
+  color: var(--ff-ink);
   font-weight: 700;
 }
 
@@ -198,7 +198,7 @@
 }
 
 .ffrpg4e-sheet .readout-list dt {
-  color: var(--ff-muted);
+  color: var(--ff-ink);
   font-weight: 700;
 }
 
@@ -206,6 +206,7 @@
   margin: 0;
   text-align: right;
   font-weight: 700;
+  color: var(--ff-ink);
 }
 
 .ffrpg4e-sheet .edit-identity {
@@ -260,7 +261,13 @@
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px;
-  align-items: center;
+  align-items: end;
+}
+
+.ffrpg4e-sheet .owned-item-manager-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .ffrpg4e-sheet .item-list {
@@ -270,7 +277,7 @@
 
 .ffrpg4e-sheet .item-row {
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) repeat(3, auto);
+  grid-template-columns: 32px minmax(0, 1fr) repeat(6, auto);
   gap: 8px;
   align-items: center;
   min-height: 34px;
@@ -294,6 +301,13 @@
 .ffrpg4e-sheet .item-row small {
   color: var(--ff-muted);
   font-size: 12px;
+}
+
+.ffrpg4e-sheet .item-count {
+  min-width: 34px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--ff-ink);
 }
 
 .ffrpg4e-sheet .empty {
@@ -333,6 +347,7 @@
   .ffrpg4e-sheet .sheet-header,
   .ffrpg4e-sheet .challenge-row,
   .ffrpg4e-sheet .owned-item-manager,
+  .ffrpg4e-sheet .owned-item-manager-grid,
   .ffrpg4e-sheet .edit-identity,
   .ffrpg4e-sheet .item-row {
     grid-template-columns: 1fr;

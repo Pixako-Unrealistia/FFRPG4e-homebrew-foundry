@@ -93,7 +93,8 @@ class ItemDataModel extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {
       description: new HTMLField({ required: true, blank: true }),
-      source: new StringField({ required: true, blank: true, initial: "Homebrew" })
+      source: new StringField({ required: true, blank: true, initial: "Homebrew" }),
+      quantity: new NumberField({ required: true, integer: true, min: 0, initial: 1 })
     };
   }
 }

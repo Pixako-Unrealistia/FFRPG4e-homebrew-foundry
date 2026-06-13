@@ -89,26 +89,13 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       type: item.type,
       typeLabel: itemTypeLabels[item.type] || item.type,
       system: item.system,
+      quantity: item.system.quantity,
       rollLabel: item.type === "spell" ? "Cast" : item.type === "ability" ? "Roll" : "Use",
       canRoll: ["ability", "spell"].includes(item.type) || (item.type === "equipment" && item.system.slot === "weapon"),
       canEquip: item.type === "equipment",
       equipped: item.type === "equipment" && item.system.equipped
     }));
-    const itemOrder = {
-      spell: 1,
-      ability: 2,
-      equipment: 3,
-      job: 4
-    };
-    const availableItems = game.items
-      .filter((item) => ["spell", "ability", "equipment", "job"].includes(item.type))
-      .map((item) => ({
-        id: item.id,
-        name: item.name,
-        type: item.type,
-        label: `${itemTypeLabels[item.type] || item.type} - ${item.name}`
-      }))
-      .sort((a, b) => (itemOrder[a.type] - itemOrder[b.type]) || a.name.localeCompare(b.name));
+    const availableItems = await this.getAvailableItems(itemTypeLabels);
     const items = {
       jobs: itemRows.filter((item) => item.type === "job"),
       abilities: itemRows.filter((item) => item.type === "ability"),
@@ -134,6 +121,36 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     };
   }
 
+  async getAvailableItems(itemTypeLabels) {
+    const packNames = ["ff6-spells", "homebrew-abilities", "ff6-equipment", "homebrew-jobs"];
+    const items = {
+      job: [],
+      ability: [],
+      spell: [],
+      equipment: []
+    };
+    for (const item of game.items.filter((item) => item.type in items)) {
+      items[item.type].push({
+        uuid: item.uuid,
+        name: item.name,
+        label: `World ${itemTypeLabels[item.type]} - ${item.name}`
+      });
+    }
+    for (const packName of packNames) {
+      const pack = game.packs.get(`ffrpg4e-homebrew-foundry.${packName}`);
+      const index = await pack.getIndex({ fields: ["name", "type"] });
+      for (const item of index) {
+        items[item.type].push({
+          uuid: `Compendium.${pack.collection}.${item._id}`,
+          name: item.name,
+          label: `${itemTypeLabels[item.type]} - ${item.name}`
+        });
+      }
+    }
+    for (const list of Object.values(items)) list.sort((a, b) => a.name.localeCompare(b.name));
+    return items;
+  }
+
   async _onRender(context, options) {
     await super._onRender(context, options);
     for (const element of this.element.querySelectorAll("[data-action]")) {
@@ -156,12 +173,21 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     if (action === "apply-job-resources") await this.actor.applyJobResources();
     if (action === "roll-item") await this.actor.rollItem(button.dataset.itemId);
     if (action === "add-owned-item") {
-      const itemId = this.element.querySelector("[data-add-owned-item]").value;
-      if (!itemId) return;
-      const source = game.items.get(itemId);
+      const uuid = this.element.querySelector(`[data-add-owned-item="${button.dataset.itemType}"]`).value;
+      if (!uuid) return;
+      const source = await fromUuid(uuid);
       const data = source.toObject();
       delete data._id;
+      data.system.quantity = 1;
       await this.actor.createEmbeddedDocuments("Item", [data]);
+    }
+    if (action === "increase-owned-item") {
+      const item = this.actor.items.get(button.dataset.itemId);
+      await item.update({ "system.quantity": item.system.quantity + 1 });
+    }
+    if (action === "decrease-owned-item") {
+      const item = this.actor.items.get(button.dataset.itemId);
+      await item.update({ "system.quantity": Math.max(0, item.system.quantity - 1) });
     }
     if (action === "remove-owned-item") {
       await this.actor.deleteEmbeddedDocuments("Item", [button.dataset.itemId]);

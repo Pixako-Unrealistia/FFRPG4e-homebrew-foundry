@@ -51,23 +51,44 @@ async function verifySheetSubmits() {
   const { FFRPGItemSheet } = await import("../module/sheets/item-sheet.mjs");
   const createdItems = [];
   const deletedItems = [];
+  const itemUpdates = [];
   globalThis.game = {
     items: {
-      get(id) {
-        if (id !== "world-spell") return null;
+      filter() {
+        return [];
+      }
+    },
+    packs: {
+      get(key) {
+        const entries = {
+          "ffrpg4e-homebrew-foundry.ff6-spells": [{ _id: "fire", name: "Fire", type: "spell" }],
+          "ffrpg4e-homebrew-foundry.homebrew-abilities": [{ _id: "jump", name: "Jump", type: "ability" }],
+          "ffrpg4e-homebrew-foundry.ff6-equipment": [{ _id: "dirk", name: "Dirk", type: "equipment" }],
+          "ffrpg4e-homebrew-foundry.homebrew-jobs": [{ _id: "warrior", name: "Warrior", type: "job" }]
+        };
         return {
-          toObject() {
-            return {
-              _id: "world-spell",
-              name: "Fire",
-              type: "spell",
-              system: {}
-            };
+          collection: key,
+          async getIndex() {
+            return entries[key];
           }
         };
       }
+    },
+    user: {
+      isGM: true
     }
   };
+  globalThis.fromUuid = async (uuid) => ({
+    uuid,
+    toObject() {
+      return {
+        _id: "world-spell",
+        name: "Fire",
+        type: "spell",
+        system: {}
+      };
+    }
+  });
   const actorSubmit = FFRPGActorSheet.prototype._processFormData.call({
     document: {
       type: "character"
@@ -95,10 +116,16 @@ async function verifySheetSubmits() {
       undefined: "invalid"
     }
   });
+  const availableItems = await FFRPGActorSheet.prototype.getAvailableItems({
+    job: "Job",
+    ability: "Ability",
+    spell: "Spell",
+    equipment: "Equipment"
+  });
   await FFRPGActorSheet.prototype.onAction.call({
     element: {
       querySelector() {
-        return { value: "world-spell" };
+        return { value: "Compendium.ffrpg4e-homebrew-foundry.ff6-spells.fire" };
       }
     },
     actor: {
@@ -113,7 +140,54 @@ async function verifySheetSubmits() {
     preventDefault() {},
     currentTarget: {
       dataset: {
-        action: "add-owned-item"
+        action: "add-owned-item",
+        itemType: "spell"
+      }
+    }
+  });
+  await FFRPGActorSheet.prototype.onAction.call({
+    element: {},
+    actor: {
+      items: {
+        get() {
+          return {
+            system: { quantity: 2 },
+            update(update) {
+              itemUpdates.push(update);
+            }
+          };
+        }
+      }
+    }
+  }, {
+    preventDefault() {},
+    currentTarget: {
+      dataset: {
+        action: "increase-owned-item",
+        itemId: "owned-spell"
+      }
+    }
+  });
+  await FFRPGActorSheet.prototype.onAction.call({
+    element: {},
+    actor: {
+      items: {
+        get() {
+          return {
+            system: { quantity: 2 },
+            update(update) {
+              itemUpdates.push(update);
+            }
+          };
+        }
+      }
+    }
+  }, {
+    preventDefault() {},
+    currentTarget: {
+      dataset: {
+        action: "decrease-owned-item",
+        itemId: "owned-spell"
       }
     }
   });
@@ -145,11 +219,18 @@ async function verifySheetSubmits() {
   assert(actorSubmit.system.combat.actions.slowUsed === false, "Actor slow checkbox default missing.");
   assert(actorSubmit.system.combat.actions.reactionUsed === false, "Actor reaction checkbox default missing.");
   assert(itemSubmit.system.equipped === false, "Equipment checkbox default missing.");
+  assert(availableItems.spell[0].uuid === "Compendium.ffrpg4e-homebrew-foundry.ff6-spells.fire", "Spell compendium option missing.");
+  assert(availableItems.ability[0].uuid === "Compendium.ffrpg4e-homebrew-foundry.homebrew-abilities.jump", "Ability compendium option missing.");
+  assert(availableItems.equipment[0].uuid === "Compendium.ffrpg4e-homebrew-foundry.ff6-equipment.dirk", "Equipment compendium option missing.");
+  assert(availableItems.job[0].uuid === "Compendium.ffrpg4e-homebrew-foundry.homebrew-jobs.warrior", "Job compendium option missing.");
   assert(createdItems[0].type === "Item", "Add owned item did not create embedded Item.");
   assert(!Object.hasOwn(createdItems[0].items[0], "_id"), "Add owned item kept source item id.");
+  assert(createdItems[0].items[0].system.quantity === 1, "Add owned item did not set quantity.");
+  assert(itemUpdates[0]["system.quantity"] === 3, "Increase owned item did not update quantity.");
+  assert(itemUpdates[1]["system.quantity"] === 1, "Decrease owned item did not update quantity.");
   assert(deletedItems[0].type === "Item", "Remove owned item did not delete embedded Item.");
   assert(deletedItems[0].ids[0] === "owned-spell", "Remove owned item used wrong id.");
-  return { actorSubmit, itemSubmit, createdItems, deletedItems };
+  return { actorSubmit, itemSubmit, availableItems, createdItems, deletedItems, itemUpdates };
 }
 
 function verifyPacks() {
@@ -201,6 +282,7 @@ function verifyTemplates() {
   const enabledNameless = [...actorTemplate.matchAll(/<(input|select|textarea)\b(?=[^>]*)(?![^>]*\bdisabled\b)(?![^>]*\bname=)[^>]*>/g)].map(match => match[0]).filter(field => !field.includes("data-roll-"));
   const rollNamedFields = [...actorTemplate.matchAll(/name="roll\.[^"]+"/g)].map(match => match[0]);
   const levelInput = actorTemplate.includes('name="system.level"');
+  const portraitEdit = actorTemplate.includes('data-edit="img"');
   const summaryEnd = actorTemplate.indexOf("<h2>Challenge</h2>");
   const summaryMarkup = actorTemplate.slice(0, summaryEnd);
   const summaryFields = [...summaryMarkup.matchAll(/<(input|select|textarea)\b[^>]*>/g)].map(match => match[0]);
@@ -208,7 +290,9 @@ function verifyTemplates() {
     "Vitals",
     "Actions",
     "Secondary Optional",
-    "Add Owned Item",
+    "Add Owned",
+    "Add Spell",
+    "Add Item",
     "Jobs Owned",
     "Abilities Owned",
     "Spells Owned",
@@ -223,6 +307,7 @@ function verifyTemplates() {
   assert(rollNamedFields.length === 0, `Named roll fields: ${rollNamedFields.join(", ")}`);
   assert(summaryFields.length === 0, `Summary contains editable fields: ${summaryFields.join(", ")}`);
   assert(levelInput, "Actor sheet has no editable level input.");
+  assert(!portraitEdit, "Actor sheet still edits actor portrait.");
   assert(!actorTemplate.includes("Homebrew Class List"), "Actor sheet still contains Homebrew Class List.");
   assert(missingActorText.length === 0, `Actor sheet missing sections: ${missingActorText.join(", ")}`);
   return {
