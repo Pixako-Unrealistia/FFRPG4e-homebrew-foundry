@@ -58,7 +58,12 @@ The importer can create or update item seeds and world document pack sources. Ad
 
 ## Seeded Content
 
-On first GM load in a world, the system creates or updates a folder named `FFRPG 4e Homebrew Content`.
+On first GM load in a world, the system creates or updates seeded items in separate folders:
+
+- `FFRPG 4e Jobs`
+- `FFRPG 4e Abilities`
+- `FFRPG 4e Spells`
+- `FFRPG 4e Equipment`
 
 Seed version: `0.3.0`
 

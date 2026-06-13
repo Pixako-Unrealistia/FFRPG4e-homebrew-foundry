@@ -207,8 +207,9 @@ function elementAffinities(profile) {
 function actorDoc(scope, name, type, data) {
   const system = actorSystem(data);
   if (type === "character") delete system.boss;
+  const documentKey = data.sourceKey || `${scope}.${name}`;
   return {
-    _id: idFor(`${scope}.${name}`),
+    _id: idFor(documentKey),
     name,
     type,
     img: data.img,
@@ -242,13 +243,14 @@ function actorDoc(scope, name, type, data) {
     flags: {
       [systemId]: {
         source: data.source,
-        sourceKey: `${scope}.${name}`
+        sourceKey: documentKey
       }
     }
   };
 }
 
 function itemDoc(scope, item) {
+  const flags = foundryFlags(item.flags, scope, item.type, item.name, item.system.source);
   return {
     _id: idFor(`${scope}.${item.type}.${item.name}`),
     name: item.name,
@@ -261,7 +263,18 @@ function itemDoc(scope, item) {
     ownership: {
       default: 0
     },
-    flags: item.flags
+    flags
+  };
+}
+
+function foundryFlags(flags, scope, type, name, source) {
+  return {
+    ...flags,
+    [systemId]: {
+      ...flags[systemId],
+      source,
+      sourceKey: `${scope}.${type}.${name}`
+    }
   };
 }
 
@@ -608,6 +621,7 @@ function enemyActor(enemy, boss) {
   return actorDoc(boss ? "ff6.boss" : "ff6.enemy", enemy.name, "npc", {
     img: "icons/svg/mystery-man.svg",
     source: "Final Fantasy VI",
+    sourceKey: `${boss ? "ff6.boss" : "ff6.enemy"}.${enemy.bestiary}.${enemy.name}`,
     biography: `<p>Final Fantasy VI bestiary #${enemy.bestiary}. Type: ${enemy.kind}.</p>`,
     level: Math.max(1, enemy.level),
     gil: enemy.gil,
@@ -769,6 +783,7 @@ function randomEncounterTables(enemies) {
 function bossEncounterJournals(bosses) {
   return bosses.map((boss) => {
     const loot = boss.loot ? boss.loot : { stolen: [], dropped: [], metamorph: [] };
+    const name = `${boss.name} #${boss.bestiary}`;
     const content = [
       `<h1>${boss.name}</h1>`,
       `<p>Level ${boss.level} ${boss.kind}. HP ${boss.hp}, MP ${boss.mp}, Gil ${boss.gil}.</p>`,
@@ -777,7 +792,7 @@ function bossEncounterJournals(bosses) {
       `<p>Drops: ${loot.dropped.length ? loot.dropped.join(", ") : "None"}.</p>`,
       `<p>Metamorph: ${loot.metamorph.length ? loot.metamorph.join(", ") : "None"}.</p>`
     ].join("");
-    return journalDoc("ff6.bossEncounter", boss.name, content);
+    return journalDoc("ff6.bossEncounter", name, content);
   });
 }
 
@@ -799,7 +814,7 @@ function lootResults(enemy) {
 function lootTables(enemies) {
   return enemies.map((enemy) => tableDoc(
     "ff6.loot",
-    `${enemy.name} Loot`,
+    `${enemy.name} #${enemy.bestiary} Loot`,
     `<p>Loot table for ${enemy.name}, Final Fantasy VI bestiary #${enemy.bestiary}.</p>`,
     lootResults(enemy)
   ));

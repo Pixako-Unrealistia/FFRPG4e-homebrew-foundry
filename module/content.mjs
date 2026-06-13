@@ -543,3 +543,23 @@ export async function importPackSourcesToWorld() {
   ui.notifications.info(`Imported ${total} FFRPG 4e compendium source documents.`);
   return result;
 }
+
+export async function importActorPackSourcesToWorld() {
+  if (!game.user.isGM) return;
+  const result = {};
+  let total = 0;
+  const actorPacks = PACK_SOURCES.filter((pack) => pack.type === "Actor");
+  for (const pack of actorPacks) {
+    const folder = await getNamedFolder(pack.name, pack.type);
+    const documents = await loadPackSource(pack);
+    const imported = await upsertDocuments(pack.type, documents, folder.id);
+    result[pack.name] = {
+      total: documents.length,
+      created: imported.created,
+      updated: imported.updated
+    };
+    total += documents.length;
+  }
+  ui.notifications.info(`Imported ${total} FFRPG 4e actors.`);
+  return result;
+}
