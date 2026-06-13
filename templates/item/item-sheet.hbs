@@ -114,6 +114,7 @@
       <label>Slot<select name="system.slot">{{#each equipmentSlotOptions as |slot|}}<option value="{{slot.key}}" {{#if slot.selected}}selected{{/if}}>{{slot.label}}</option>{{/each}}</select></label>
       <label>Equipped<input name="system.equipped" type="checkbox" {{#if system.equipped}}checked{{/if}}></label>
     </div>
+    <label>Action Type<select name="system.actionType">{{#each actionTypeOptions as |actionType|}}<option value="{{actionType.key}}" {{#if actionType.selected}}selected{{/if}}>{{actionType.label}}</option>{{/each}}</select></label>
     <div class="grid two">
       <label>Level<input name="system.level" type="number" value="{{system.level}}" min="1"></label>
       <label>Gil Cost<input name="system.cost" type="number" value="{{system.cost}}" min="0"></label>

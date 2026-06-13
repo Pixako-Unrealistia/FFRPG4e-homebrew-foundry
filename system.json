@@ -136,17 +136,66 @@
       "system": "ffrpg4e-homebrew-foundry"
     },
     {
-      "name": "ff6-encounter-scenes",
-      "label": "FF6 Encounter Scenes",
-      "path": "packs/ff6-encounter-scenes.db",
-      "type": "Scene",
-      "system": "ffrpg4e-homebrew-foundry"
-    },
-    {
       "name": "ff6-loot-tables",
       "label": "FF6 Loot Tables",
       "path": "packs/ff6-loot-tables.db",
       "type": "RollTable",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-macros",
+      "label": "FF6 Macros",
+      "path": "packs/ff6-macros.db",
+      "type": "Macro",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-cards",
+      "label": "FF6 Cards",
+      "path": "packs/ff6-cards.db",
+      "type": "Cards",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-playlists",
+      "label": "FF6 Playlists",
+      "path": "packs/ff6-playlists.db",
+      "type": "Playlist",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-adventures",
+      "label": "FF6 Adventures",
+      "path": "packs/ff6-adventures.db",
+      "type": "Adventure",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-progression",
+      "label": "FF6 Progression",
+      "path": "packs/ff6-progression.db",
+      "type": "JournalEntry",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-shops",
+      "label": "FF6 Shops",
+      "path": "packs/ff6-shops.db",
+      "type": "RollTable",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-treasures",
+      "label": "FF6 Treasures",
+      "path": "packs/ff6-treasures.db",
+      "type": "RollTable",
+      "system": "ffrpg4e-homebrew-foundry"
+    },
+    {
+      "name": "ff6-vehicles",
+      "label": "FF6 Vehicles",
+      "path": "packs/ff6-vehicles.db",
+      "type": "Actor",
       "system": "ffrpg4e-homebrew-foundry"
     }
   ],
