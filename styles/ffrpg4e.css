@@ -4,11 +4,22 @@
   --ff-muted: #746b5e;
   --ff-line: #c9bda8;
   --ff-panel: #fffaf0;
+  --ff-control: #ffffff;
+  --ff-control-disabled: #e8dfcf;
+  --ff-accent: #6f4f3d;
+  --ff-accent-ink: #fff7e6;
   color: var(--ff-ink);
 }
 
 .ffrpg4e .window-content {
   background: var(--ff-bg);
+  color: var(--ff-ink);
+  overflow-y: auto;
+}
+
+.ffrpg4e.sheet form {
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .ffrpg4e-sheet {
@@ -77,6 +88,7 @@
   margin: 0 0 10px;
   font-size: 18px;
   font-weight: 700;
+  color: var(--ff-ink);
 }
 
 .ffrpg4e-sheet h3 {
@@ -90,12 +102,57 @@
   display: grid;
   gap: 4px;
   font-weight: 600;
+  color: var(--ff-ink);
 }
 
 .ffrpg4e-sheet input,
 .ffrpg4e-sheet select,
 .ffrpg4e-sheet textarea {
   width: 100%;
+  min-height: 32px;
+  background: var(--ff-control);
+  border: 1px solid var(--ff-line);
+  color: var(--ff-ink);
+  border-radius: 4px;
+  padding: 5px 8px;
+}
+
+.ffrpg4e-sheet input:focus,
+.ffrpg4e-sheet select:focus,
+.ffrpg4e-sheet textarea:focus {
+  outline: 2px solid #9f6c43;
+  outline-offset: 1px;
+  box-shadow: none;
+}
+
+.ffrpg4e-sheet input:disabled,
+.ffrpg4e-sheet select:disabled,
+.ffrpg4e-sheet textarea:disabled {
+  background: var(--ff-control-disabled);
+  color: var(--ff-muted);
+  opacity: 1;
+}
+
+.ffrpg4e-sheet input[type="checkbox"] {
+  width: auto;
+  min-height: 0;
+  justify-self: start;
+}
+
+.ffrpg4e-sheet button {
+  min-height: 32px;
+  background: var(--ff-accent);
+  border: 1px solid #5f4234;
+  color: var(--ff-accent-ink);
+  border-radius: 4px;
+  font-weight: 700;
+  padding: 5px 10px;
+}
+
+.ffrpg4e-sheet button:hover,
+.ffrpg4e-sheet button:focus {
+  background: #875f49;
+  color: #ffffff;
 }
 
 .ffrpg4e-sheet textarea {

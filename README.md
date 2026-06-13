@@ -6,7 +6,7 @@ Changes are made to specifically tailor for final fantasy 6 content.
 
 ## Status
 
-- System version: `0.3.2`
+- System version: `0.3.4`
 - Foundry target: v14
 - Latest Foundry release checked during setup: v14 build 364, June 10, 2026
 - System id: `ffrpg4e-homebrew-foundry`
@@ -71,7 +71,7 @@ On first GM load in a world, the system creates or updates seeded items, actor p
 - `FF6 Vehicles`
 - `FF6 Macros`
 
-Seed version: `0.3.2`
+Seed version: `0.3.4`
 
 Seeded item count:
 

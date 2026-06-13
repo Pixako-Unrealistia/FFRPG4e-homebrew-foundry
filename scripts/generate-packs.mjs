@@ -26,6 +26,23 @@ const playableNames = new Set([
   "Umaro"
 ]);
 
+const playablePortraits = {
+  "Terra Branford": "terra.png",
+  "Locke Cole": "locke.png",
+  "Edgar Roni Figaro": "edgar.png",
+  "Sabin Rene Figaro": "sabin.png",
+  "Celes Chere": "celes.png",
+  "Cyan Garamonde": "cyan.png",
+  Gau: "gau.png",
+  "Setzer Gabbiani": "setzer.png",
+  Shadow: "shadow.png",
+  "Strago Magus": "strago.png",
+  "Relm Arrowny": "relm.png",
+  Mog: "mog.png",
+  Gogo: "gogo.png",
+  Umaro: "umaro.png"
+};
+
 const extraGuests = [
   { name: "Biggs", job: "magitekPilot", earth: 30, air: 20, fire: 20, water: 10 },
   { name: "Wedge", job: "magitekPilot", earth: 30, air: 20, fire: 20, water: 10 },
@@ -678,8 +695,9 @@ function parseCharacterFiles() {
 
 function characterActor(character, playable) {
   const primary = playable ? inferJob(character.name) : "mediator";
+  const portrait = playable ? playablePortrait(character.name) : "icons/svg/mystery-man.svg";
   return actorDoc(playable ? "ff6.playable" : "ff6.guest", character.name, playable ? "character" : "npc", {
-    img: "icons/svg/mystery-man.svg",
+    img: portrait,
     source: "Final Fantasy VI",
     biography: `<p>${character.occupation} from Final Fantasy VI.</p>`,
     level: 1,
@@ -701,6 +719,12 @@ function characterActor(character, playable) {
     elementProfile: {},
     boss: false
   });
+}
+
+function playablePortrait(name) {
+  const file = playablePortraits[name];
+  if (file) return `systems/${systemId}/assets/portraits/player-characters/${file}`;
+  return "icons/svg/mystery-man.svg";
 }
 
 function extraGuestActor(guest) {

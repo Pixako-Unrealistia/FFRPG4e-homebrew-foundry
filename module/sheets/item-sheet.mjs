@@ -76,7 +76,11 @@ export class FFRPGItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
   }
 
   static async onSubmit(event, form, formData) {
-    if (this.document.type === "equipment" && !Object.hasOwn(formData.object, "system.equipped")) formData.object["system.equipped"] = false;
-    await this.document.update(formData.object);
+    const data = foundry.utils.flattenObject(formData.object);
+    for (const key of Object.keys(data)) {
+      if (!key || key === "undefined") delete data[key];
+    }
+    if (this.document.type === "equipment" && !Object.hasOwn(data, "system.equipped")) data["system.equipped"] = false;
+    await this.document.update(data);
   }
 }

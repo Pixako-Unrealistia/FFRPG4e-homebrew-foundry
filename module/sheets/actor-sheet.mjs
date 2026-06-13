@@ -118,9 +118,13 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   }
 
   static async onSubmit(event, form, formData) {
-    for (const key of ["system.combat.defeated", "system.combat.actions.quickUsed", "system.combat.actions.slowUsed", "system.combat.actions.reactionUsed"]) {
-      if (!Object.hasOwn(formData.object, key)) formData.object[key] = false;
+    const data = foundry.utils.flattenObject(formData.object);
+    for (const key of Object.keys(data)) {
+      if (!key || key === "undefined" || key.startsWith("roll.")) delete data[key];
     }
-    await this.document.update(formData.object);
+    for (const key of ["system.combat.defeated", "system.combat.actions.quickUsed", "system.combat.actions.slowUsed", "system.combat.actions.reactionUsed"]) {
+      if (!Object.hasOwn(data, key)) data[key] = false;
+    }
+    await this.document.update(data);
   }
 }
