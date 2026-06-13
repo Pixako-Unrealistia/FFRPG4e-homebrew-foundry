@@ -49,6 +49,23 @@
   gap: 10px;
 }
 
+.ffrpg4e-sheet .identity-summary {
+  display: grid;
+  gap: 6px;
+}
+
+.ffrpg4e-sheet .identity-summary h1 {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.1;
+  color: var(--ff-ink);
+}
+
+.ffrpg4e-sheet .summary-line {
+  color: var(--ff-muted);
+  font-weight: 700;
+}
+
 .ffrpg4e-sheet .name {
   height: 42px;
   font-size: 24px;
@@ -69,6 +86,12 @@
 
 .ffrpg4e-sheet .grid.two {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ffrpg4e-sheet .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .ffrpg4e-sheet .sheet-actions {
@@ -165,6 +188,31 @@
   grid-template-columns: 48px 1fr 16px 1fr;
   gap: 8px;
   align-items: center;
+}
+
+.ffrpg4e-sheet .readout-list dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 10px;
+  margin: 0;
+}
+
+.ffrpg4e-sheet .readout-list dt {
+  color: var(--ff-muted);
+  font-weight: 700;
+}
+
+.ffrpg4e-sheet .readout-list dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 700;
+}
+
+.ffrpg4e-sheet .edit-identity {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 12px;
+  align-items: start;
 }
 
 .ffrpg4e-sheet .resource-suggestion {
@@ -281,9 +329,11 @@
 
 @media (max-width: 720px) {
   .ffrpg4e-sheet .grid.two,
+  .ffrpg4e-sheet .summary-grid,
   .ffrpg4e-sheet .sheet-header,
   .ffrpg4e-sheet .challenge-row,
   .ffrpg4e-sheet .owned-item-manager,
+  .ffrpg4e-sheet .edit-identity,
   .ffrpg4e-sheet .item-row {
     grid-template-columns: 1fr;
   }

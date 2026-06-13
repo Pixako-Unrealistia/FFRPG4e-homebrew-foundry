@@ -1,16 +1,10 @@
 <div class="ffrpg4e-sheet">
-  <header class="sheet-header">
-    <img class="portrait" src="{{actor.img}}" data-edit="img" alt="{{actor.name}}">
-    <div class="identity">
-      <input class="name" name="name" type="text" value="{{actor.name}}">
-      <div class="line">
-        <label>Level</label>
-        <input name="system.level" type="number" value="{{system.level}}" min="1">
-      </div>
-      <div class="line">
-        <label>Gil</label>
-        <input name="system.gil" type="number" value="{{system.gil}}" min="0">
-      </div>
+  <header class="sheet-header summary-header">
+    <img class="portrait" src="{{actor.img}}" alt="{{actor.name}}">
+    <div class="identity-summary">
+      <h1>{{actor.name}}</h1>
+      <div class="summary-line">Level {{system.level}} / {{system.gil}} gil</div>
+      <div class="summary-line">{{summary.primaryJob}} / {{summary.secondaryJob}}</div>
     </div>
     <div class="sheet-actions">
       <button type="button" data-action="roll-initiative">Initiative</button>
@@ -18,95 +12,38 @@
       <button type="button" data-action="reset-actions">Reset Actions</button>
     </div>
   </header>
-  <section class="grid two">
-    <div class="panel">
-      <h2>Jobs</h2>
-      <label>Primary</label>
-      <select name="system.jobs.primary">
-        <option value=""></option>
-        {{#each jobOptions as |job|}}
-        <option value="{{job.key}}" {{#if job.selectedPrimary}}selected{{/if}}>{{job.label}} - {{job.categoryLabel}}</option>
-        {{/each}}
-      </select>
-      <label>Secondary Optional</label>
-      <select name="system.jobs.secondary">
-        <option value=""></option>
-        {{#each jobOptions as |job|}}
-        <option value="{{job.key}}" {{#if job.selectedSecondary}}selected{{/if}}>{{job.label}} - {{job.categoryLabel}}</option>
-        {{/each}}
-      </select>
+  <section class="summary-grid">
+    <div class="panel readout-list">
+      <h2>Vitals</h2>
+      <dl>
+        <dt>HP</dt><dd>{{system.resources.hp.value}} / {{system.resources.hp.max}}</dd>
+        <dt>MP</dt><dd>{{system.resources.mp.value}} / {{system.resources.mp.max}}</dd>
+        <dt>Status</dt><dd>{{summary.status}}</dd>
+      </dl>
     </div>
-    <div class="panel">
-      <h2>Resources</h2>
-      <div class="resources">
-        <label>HP</label>
-        <input name="system.resources.hp.value" type="number" value="{{system.resources.hp.value}}" min="0">
-        <span>/</span>
-        <input name="system.resources.hp.max" type="number" value="{{system.resources.hp.max}}" min="0">
-        <label>MP</label>
-        <input name="system.resources.mp.value" type="number" value="{{system.resources.mp.value}}" min="0">
-        <span>/</span>
-        <input name="system.resources.mp.max" type="number" value="{{system.resources.mp.max}}" min="0">
-      </div>
-      <div class="resource-suggestion">
-        Suggested HP {{derived.hpMax}}, MP {{derived.mpMax}}
-        <button type="button" data-action="apply-job-resources">Apply</button>
-      </div>
-    </div>
-  </section>
-  <section class="grid two">
-    <div class="panel">
-      <h2>Stats</h2>
-      <div class="stats-grid">
-        {{#each statEntries as |stat|}}
-        <label>{{stat.label}}<input name="system.stats.{{stat.key}}.value" type="number" value="{{stat.value}}" min="0" max="255"></label>
-        <div class="stat-level">Lv {{stat.level}}</div>
-        {{/each}}
-      </div>
-    </div>
-    <div class="panel">
+    <div class="panel readout-list">
       <h2>Defense</h2>
-      <div class="resources">
-        <label>ARM</label>
-        <input name="system.combat.arm" type="number" value="{{system.combat.arm}}" min="0">
-        <span>=</span>
-        <input type="number" value="{{derived.arm}}" disabled>
-        <label>MARM</label>
-        <input name="system.combat.marm" type="number" value="{{system.combat.marm}}" min="0">
-        <span>=</span>
-        <input type="number" value="{{derived.marm}}" disabled>
-      </div>
+      <dl>
+        <dt>ARM</dt><dd>{{derived.arm}}</dd>
+        <dt>MARM</dt><dd>{{derived.marm}}</dd>
+        <dt>AI</dt><dd>{{summary.ai}}</dd>
+      </dl>
     </div>
-  </section>
-  <section class="grid two">
-    <div class="panel">
-      <h2>Combat State</h2>
-      <label>KO<input name="system.combat.defeated" type="checkbox" {{#if system.combat.defeated}}checked{{/if}}></label>
-      <label>AI<select name="system.combat.ai">{{#each aiOptions as |ai|}}<option value="{{ai.key}}" {{#if ai.selected}}selected{{/if}}>{{ai.label}}</option>{{/each}}</select></label>
-      <div class="skills-grid">
-        <label>Quick Used<input name="system.combat.actions.quickUsed" type="checkbox" {{#if system.combat.actions.quickUsed}}checked{{/if}}></label>
-        <label>Slow Used<input name="system.combat.actions.slowUsed" type="checkbox" {{#if system.combat.actions.slowUsed}}checked{{/if}}></label>
-        <label>Reaction Used<input name="system.combat.actions.reactionUsed" type="checkbox" {{#if system.combat.actions.reactionUsed}}checked{{/if}}></label>
-      </div>
+    <div class="panel readout-list">
+      <h2>Actions</h2>
+      <dl>
+        <dt>Quick</dt><dd>{{summary.quickAction}}</dd>
+        <dt>Slow</dt><dd>{{summary.slowAction}}</dd>
+        <dt>Reaction</dt><dd>{{summary.reaction}}</dd>
+      </dl>
     </div>
-    <div class="panel">
-      <h2>Rewards</h2>
-      <div class="resources">
-        <label>EXP</label>
-        <input name="system.combat.rewards.exp" type="number" value="{{system.combat.rewards.exp}}" min="0">
-        <span></span>
-        <span></span>
-        <label>AP</label>
-        <input name="system.combat.rewards.ap" type="number" value="{{system.combat.rewards.ap}}" min="0">
-      </div>
-    </div>
-  </section>
-  <section class="panel">
-    <h2>Elements</h2>
-    <div class="skills-grid">
-      {{#each elementEntries as |element|}}
-      <label>{{element.label}}<select name="system.elements.{{element.key}}">{{#each element.options as |option|}}<option value="{{option.key}}" {{#if option.selected}}selected{{/if}}>{{option.label}}</option>{{/each}}</select></label>
-      {{/each}}
+    <div class="panel readout-list">
+      <h2>Stats</h2>
+      <dl>
+        {{#each statEntries as |stat|}}
+        <dt>{{stat.label}}</dt><dd>{{stat.value}} / Lv {{stat.level}}</dd>
+        {{/each}}
+      </dl>
     </div>
   </section>
   <section class="panel">
@@ -119,14 +56,6 @@
       </select>
       <input data-roll-difficulty type="number" value="30" min="1" max="99">
       <button type="button" data-action="roll-challenge">Roll</button>
-    </div>
-  </section>
-  <section class="panel">
-    <h2>Skills</h2>
-    <div class="skills-grid">
-      {{#each skillOptions as |skill|}}
-      <label>{{skill.label}}<input name="system.skills.{{skill.key}}" type="number" value="{{skill.value}}" min="0"></label>
-      {{/each}}
     </div>
   </section>
   {{#if canManageItems}}
@@ -145,20 +74,6 @@
   {{/if}}
   <section class="grid two">
     <div class="panel item-list">
-      <h2>Jobs Owned</h2>
-      {{#each items.jobs as |item|}}
-      <div class="item-row">
-        <img src="{{item.img}}" alt="{{item.name}}">
-        <span><strong>{{item.name}}</strong><small>{{item.typeLabel}}</small></span>
-        {{#if ../canManageItems}}
-        <button type="button" data-action="remove-owned-item" data-item-id="{{item.id}}">Remove</button>
-        {{/if}}
-      </div>
-      {{else}}
-      <p class="empty">No owned job items.</p>
-      {{/each}}
-    </div>
-    <div class="panel item-list">
       <h2>Abilities Owned</h2>
       {{#each items.abilities as |item|}}
       <div class="item-row">
@@ -173,8 +88,6 @@
       <p class="empty">No owned abilities.</p>
       {{/each}}
     </div>
-  </section>
-  <section class="grid two">
     <div class="panel item-list">
       <h2>Spells Owned</h2>
       {{#each items.spells as |item|}}
@@ -190,6 +103,8 @@
       <p class="empty">No owned spells.</p>
       {{/each}}
     </div>
+  </section>
+  <section class="grid two">
     <div class="panel item-list">
       <h2>Equipment Owned</h2>
       {{#each items.equipment as |item|}}
@@ -206,6 +121,20 @@
       </div>
       {{else}}
       <p class="empty">No owned equipment.</p>
+      {{/each}}
+    </div>
+    <div class="panel item-list">
+      <h2>Jobs Owned</h2>
+      {{#each items.jobs as |item|}}
+      <div class="item-row">
+        <img src="{{item.img}}" alt="{{item.name}}">
+        <span><strong>{{item.name}}</strong><small>{{item.typeLabel}}</small></span>
+        {{#if ../canManageItems}}
+        <button type="button" data-action="remove-owned-item" data-item-id="{{item.id}}">Remove</button>
+        {{/if}}
+      </div>
+      {{else}}
+      <p class="empty">No owned job items.</p>
       {{/each}}
     </div>
   </section>
@@ -227,11 +156,127 @@
     {{/each}}
   </section>
   <section class="panel">
-    <h2>Status Effects</h2>
+    <h2>Edit Identity</h2>
+    <div class="edit-identity">
+      <img class="portrait" src="{{actor.img}}" data-edit="img" alt="{{actor.name}}">
+      <div class="identity">
+        <label>Name<input class="name" name="name" type="text" value="{{actor.name}}"></label>
+        <div class="line">
+          <label>Level</label>
+          <input name="system.level" type="number" value="{{system.level}}" min="1">
+        </div>
+        <div class="line">
+          <label>Gil</label>
+          <input name="system.gil" type="number" value="{{system.gil}}" min="0">
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="grid two">
+    <div class="panel">
+      <h2>Edit Jobs</h2>
+      <label>Primary</label>
+      <select name="system.jobs.primary">
+        <option value=""></option>
+        {{#each jobOptions as |job|}}
+        <option value="{{job.key}}" {{#if job.selectedPrimary}}selected{{/if}}>{{job.label}} - {{job.categoryLabel}}</option>
+        {{/each}}
+      </select>
+      <label>Secondary Optional</label>
+      <select name="system.jobs.secondary">
+        <option value=""></option>
+        {{#each jobOptions as |job|}}
+        <option value="{{job.key}}" {{#if job.selectedSecondary}}selected{{/if}}>{{job.label}} - {{job.categoryLabel}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="panel">
+      <h2>Edit Resources</h2>
+      <div class="resources">
+        <label>HP</label>
+        <input name="system.resources.hp.value" type="number" value="{{system.resources.hp.value}}" min="0">
+        <span>/</span>
+        <input name="system.resources.hp.max" type="number" value="{{system.resources.hp.max}}" min="0">
+        <label>MP</label>
+        <input name="system.resources.mp.value" type="number" value="{{system.resources.mp.value}}" min="0">
+        <span>/</span>
+        <input name="system.resources.mp.max" type="number" value="{{system.resources.mp.max}}" min="0">
+      </div>
+      <div class="resource-suggestion">
+        Suggested HP {{derived.hpMax}}, MP {{derived.mpMax}}
+        <button type="button" data-action="apply-job-resources">Apply</button>
+      </div>
+    </div>
+  </section>
+  <section class="grid two">
+    <div class="panel">
+      <h2>Edit Stats</h2>
+      <div class="stats-grid">
+        {{#each statEntries as |stat|}}
+        <label>{{stat.label}}<input name="system.stats.{{stat.key}}.value" type="number" value="{{stat.value}}" min="0" max="255"></label>
+        <div class="stat-level">Lv {{stat.level}}</div>
+        {{/each}}
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Edit Defense</h2>
+      <div class="resources">
+        <label>ARM</label>
+        <input name="system.combat.arm" type="number" value="{{system.combat.arm}}" min="0">
+        <span>=</span>
+        <input type="number" value="{{derived.arm}}" disabled>
+        <label>MARM</label>
+        <input name="system.combat.marm" type="number" value="{{system.combat.marm}}" min="0">
+        <span>=</span>
+        <input type="number" value="{{derived.marm}}" disabled>
+      </div>
+    </div>
+  </section>
+  <section class="grid two">
+    <div class="panel">
+      <h2>Edit Combat State</h2>
+      <label>KO<input name="system.combat.defeated" type="checkbox" {{#if system.combat.defeated}}checked{{/if}}></label>
+      <label>AI<select name="system.combat.ai">{{#each aiOptions as |ai|}}<option value="{{ai.key}}" {{#if ai.selected}}selected{{/if}}>{{ai.label}}</option>{{/each}}</select></label>
+      <div class="skills-grid">
+        <label>Quick Used<input name="system.combat.actions.quickUsed" type="checkbox" {{#if system.combat.actions.quickUsed}}checked{{/if}}></label>
+        <label>Slow Used<input name="system.combat.actions.slowUsed" type="checkbox" {{#if system.combat.actions.slowUsed}}checked{{/if}}></label>
+        <label>Reaction Used<input name="system.combat.actions.reactionUsed" type="checkbox" {{#if system.combat.actions.reactionUsed}}checked{{/if}}></label>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Edit Rewards</h2>
+      <div class="resources">
+        <label>EXP</label>
+        <input name="system.combat.rewards.exp" type="number" value="{{system.combat.rewards.exp}}" min="0">
+        <span></span>
+        <span></span>
+        <label>AP</label>
+        <input name="system.combat.rewards.ap" type="number" value="{{system.combat.rewards.ap}}" min="0">
+      </div>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Edit Elements</h2>
+    <div class="skills-grid">
+      {{#each elementEntries as |element|}}
+      <label>{{element.label}}<select name="system.elements.{{element.key}}">{{#each element.options as |option|}}<option value="{{option.key}}" {{#if option.selected}}selected{{/if}}>{{option.label}}</option>{{/each}}</select></label>
+      {{/each}}
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Edit Skills</h2>
+    <div class="skills-grid">
+      {{#each skillOptions as |skill|}}
+      <label>{{skill.label}}<input name="system.skills.{{skill.key}}" type="number" value="{{skill.value}}" min="0"></label>
+      {{/each}}
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Edit Status Effects</h2>
     <textarea name="system.combat.statuses" rows="4">{{system.combat.statuses}}</textarea>
   </section>
   <section class="panel">
-    <h2>Biography</h2>
+    <h2>Edit Biography</h2>
     <textarea name="system.biography" rows="8">{{system.biography}}</textarea>
   </section>
 </div>

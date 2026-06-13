@@ -65,6 +65,17 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         selected: option.key === system.elements[key]
       }))
     }));
+    const primaryJob = CONFIG.FFRPG4E.jobs[system.jobs.primary];
+    const secondaryJob = CONFIG.FFRPG4E.jobs[system.jobs.secondary];
+    const summary = {
+      primaryJob: primaryJob ? `${primaryJob.label} - ${CONFIG.FFRPG4E.jobCategories[primaryJob.category]}` : "None",
+      secondaryJob: secondaryJob ? `${secondaryJob.label} - ${CONFIG.FFRPG4E.jobCategories[secondaryJob.category]}` : "None",
+      ai: CONFIG.FFRPG4E.aiTypes[system.combat.ai],
+      quickAction: system.combat.actions.quickUsed ? "Used" : "Ready",
+      slowAction: system.combat.actions.slowUsed ? "Used" : "Ready",
+      reaction: system.combat.actions.reactionUsed ? "Used" : "Ready",
+      status: system.combat.defeated ? "KO" : "Active"
+    };
     const itemTypeLabels = {
       job: "Job",
       ability: "Ability",
@@ -116,6 +127,7 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       skillOptions,
       aiOptions,
       elementEntries,
+      summary,
       items,
       availableItems,
       canManageItems: game.user.isGM

@@ -201,24 +201,34 @@ function verifyTemplates() {
   const enabledNameless = [...actorTemplate.matchAll(/<(input|select|textarea)\b(?=[^>]*)(?![^>]*\bdisabled\b)(?![^>]*\bname=)[^>]*>/g)].map(match => match[0]).filter(field => !field.includes("data-roll-"));
   const rollNamedFields = [...actorTemplate.matchAll(/name="roll\.[^"]+"/g)].map(match => match[0]);
   const levelInput = actorTemplate.includes('name="system.level"');
+  const summaryEnd = actorTemplate.indexOf("<h2>Challenge</h2>");
+  const summaryMarkup = actorTemplate.slice(0, summaryEnd);
+  const summaryFields = [...summaryMarkup.matchAll(/<(input|select|textarea)\b[^>]*>/g)].map(match => match[0]);
   const requiredActorText = [
+    "Vitals",
+    "Actions",
     "Secondary Optional",
     "Add Owned Item",
     "Jobs Owned",
     "Abilities Owned",
     "Spells Owned",
     "Equipment Owned",
-    "Other Items Owned"
+    "Other Items Owned",
+    "Edit Identity",
+    "Edit Jobs",
+    "Edit Resources"
   ];
   const missingActorText = requiredActorText.filter(text => !actorTemplate.includes(text));
   assert(enabledNameless.length === 0, `Enabled nameless actor fields: ${enabledNameless.join(", ")}`);
   assert(rollNamedFields.length === 0, `Named roll fields: ${rollNamedFields.join(", ")}`);
+  assert(summaryFields.length === 0, `Summary contains editable fields: ${summaryFields.join(", ")}`);
   assert(levelInput, "Actor sheet has no editable level input.");
   assert(!actorTemplate.includes("Homebrew Class List"), "Actor sheet still contains Homebrew Class List.");
   assert(missingActorText.length === 0, `Actor sheet missing sections: ${missingActorText.join(", ")}`);
   return {
     actorEnabledNamelessFields: enabledNameless.length,
     actorNamedRollFields: rollNamedFields.length,
+    actorSummaryFields: summaryFields.length,
     actorLevelInput: levelInput,
     actorInventorySections: requiredActorText.length
   };
