@@ -28,63 +28,60 @@ globalThis.foundry = {
     }
   },
   utils: {
-    flattenObject
+    flattenObject,
+    expandObject(object) {
+      const expanded = {};
+      for (const [key, value] of Object.entries(object)) {
+        if (!key) continue;
+        const parts = key.split(".");
+        let target = expanded;
+        while (parts.length > 1) {
+          const part = parts.shift();
+          target = target[part] ??= {};
+        }
+        target[parts[0]] = value;
+      }
+      return expanded;
+    }
   }
 };
 
 async function verifySheetSubmits() {
   const { FFRPGActorSheet } = await import("../module/sheets/actor-sheet.mjs");
   const { FFRPGItemSheet } = await import("../module/sheets/item-sheet.mjs");
-  let actorUpdate = null;
-  await FFRPGActorSheet.onSubmit.call({
+  const actorSubmit = FFRPGActorSheet.prototype._processFormData.call({
     document: {
-      update(data) {
-        actorUpdate = data;
-      }
+      type: "character"
     }
   }, null, null, {
     object: {
       name: "Zane Greyford",
-      roll: {
-        skill: "acrobatics",
-        difficulty: 30
-      },
-      system: {
-        gil: 25,
-        combat: {
-          actions: {
-            quickUsed: true
-          }
-        }
-      },
+      "roll.skill": "acrobatics",
+      "roll.difficulty": 30,
+      "system.gil": 25,
+      "system.combat.actions.quickUsed": true,
       undefined: "invalid"
     }
   });
-  let itemUpdate = null;
-  await FFRPGItemSheet.onSubmit.call({
+  const itemSubmit = FFRPGItemSheet.prototype._processFormData.call({
     document: {
-      type: "equipment",
-      update(data) {
-        itemUpdate = data;
-      }
+      type: "equipment"
     }
   }, null, null, {
     object: {
       name: "Dagger",
-      system: {
-        cost: 150
-      },
+      "system.cost": 150,
       undefined: "invalid"
     }
   });
-  assert(!Object.keys(actorUpdate).some(key => key.startsWith("roll.")), "Actor submit leaked roll fields.");
-  assert(!Object.hasOwn(actorUpdate, "undefined"), "Actor submit leaked undefined key.");
-  assert(!Object.hasOwn(itemUpdate, "undefined"), "Item submit leaked undefined key.");
-  assert(actorUpdate["system.combat.defeated"] === false, "Actor KO checkbox default missing.");
-  assert(actorUpdate["system.combat.actions.slowUsed"] === false, "Actor slow checkbox default missing.");
-  assert(actorUpdate["system.combat.actions.reactionUsed"] === false, "Actor reaction checkbox default missing.");
-  assert(itemUpdate["system.equipped"] === false, "Equipment checkbox default missing.");
-  return { actorUpdate, itemUpdate };
+  assert(!Object.hasOwn(actorSubmit, "roll"), "Actor submit leaked roll fields.");
+  assert(!Object.hasOwn(actorSubmit, "undefined"), "Actor submit leaked undefined key.");
+  assert(!Object.hasOwn(itemSubmit, "undefined"), "Item submit leaked undefined key.");
+  assert(actorSubmit.system.combat.defeated === false, "Actor KO checkbox default missing.");
+  assert(actorSubmit.system.combat.actions.slowUsed === false, "Actor slow checkbox default missing.");
+  assert(actorSubmit.system.combat.actions.reactionUsed === false, "Actor reaction checkbox default missing.");
+  assert(itemSubmit.system.equipped === false, "Equipment checkbox default missing.");
+  return { actorSubmit, itemSubmit };
 }
 
 function verifyPacks() {
@@ -133,10 +130,14 @@ function verifyPacks() {
 
 function verifyTemplates() {
   const actorTemplate = fs.readFileSync("templates/actor/actor-sheet.hbs", "utf8");
-  const enabledNameless = [...actorTemplate.matchAll(/<(input|select|textarea)\b(?=[^>]*)(?![^>]*\bdisabled\b)(?![^>]*\bname=)[^>]*>/g)].map(match => match[0]);
+  const enabledNameless = [...actorTemplate.matchAll(/<(input|select|textarea)\b(?=[^>]*)(?![^>]*\bdisabled\b)(?![^>]*\bname=)[^>]*>/g)].map(match => match[0]).filter(field => !field.includes("data-roll-"));
+  const rollNamedFields = [...actorTemplate.matchAll(/name="roll\.[^"]+"/g)].map(match => match[0]);
   assert(enabledNameless.length === 0, `Enabled nameless actor fields: ${enabledNameless.join(", ")}`);
+  assert(rollNamedFields.length === 0, `Named roll fields: ${rollNamedFields.join(", ")}`);
+  assert(!actorTemplate.includes("Homebrew Class List"), "Actor sheet still contains Homebrew Class List.");
   return {
-    actorEnabledNamelessFields: enabledNameless.length
+    actorEnabledNamelessFields: enabledNameless.length,
+    actorNamedRollFields: rollNamedFields.length
   };
 }
 

@@ -13,7 +13,6 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       resizable: true
     },
     form: {
-      handler: FFRPGActorSheet.onSubmit,
       submitOnChange: true,
       closeOnSubmit: false
     }
@@ -35,11 +34,6 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       categoryLabel: CONFIG.FFRPG4E.jobCategories[job.category],
       selectedPrimary: key === system.jobs.primary,
       selectedSecondary: key === system.jobs.secondary
-    }));
-    const categories = Object.entries(CONFIG.FFRPG4E.jobCategories).map(([key, label]) => ({
-      key,
-      label,
-      jobs: jobOptions.filter((job) => job.category === key)
     }));
     const statEntries = Object.entries(CONFIG.FFRPG4E.stats).map(([key, label]) => ({
       key,
@@ -78,10 +72,10 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     };
     return {
       ...context,
+      actor: this.actor,
       system,
       derived,
       jobOptions,
-      categories,
       statEntries,
       skillOptions,
       aiOptions,
@@ -102,8 +96,8 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     const button = event.currentTarget;
     const action = button.dataset.action;
     if (action === "roll-challenge") {
-      const skill = this.element.querySelector("[name='roll.skill']").value;
-      const difficulty = Number(this.element.querySelector("[name='roll.difficulty']").value);
+      const skill = this.element.querySelector("[data-roll-skill]").value;
+      const difficulty = Number(this.element.querySelector("[data-roll-difficulty]").value);
       await this.actor.rollChallenge(skill, difficulty);
     }
     if (action === "roll-initiative") await this.actor.rollInitiativeDice();
@@ -117,14 +111,19 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     }
   }
 
-  static async onSubmit(event, form, formData) {
-    const data = foundry.utils.flattenObject(formData.object);
+  _processFormData(event, form, formData) {
+    const data = { ...formData.object };
     for (const key of Object.keys(data)) {
       if (!key || key === "undefined" || key.startsWith("roll.")) delete data[key];
     }
-    for (const key of ["system.combat.defeated", "system.combat.actions.quickUsed", "system.combat.actions.slowUsed", "system.combat.actions.reactionUsed"]) {
-      if (!Object.hasOwn(data, key)) data[key] = false;
-    }
-    await this.document.update(data);
+    const submitData = foundry.utils.expandObject(data);
+    submitData.system ??= {};
+    submitData.system.combat ??= {};
+    submitData.system.combat.actions ??= {};
+    if (!("defeated" in submitData.system.combat)) submitData.system.combat.defeated = false;
+    if (!("quickUsed" in submitData.system.combat.actions)) submitData.system.combat.actions.quickUsed = false;
+    if (!("slowUsed" in submitData.system.combat.actions)) submitData.system.combat.actions.slowUsed = false;
+    if (!("reactionUsed" in submitData.system.combat.actions)) submitData.system.combat.actions.reactionUsed = false;
+    return submitData;
   }
 }

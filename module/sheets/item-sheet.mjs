@@ -13,7 +13,6 @@ export class FFRPGItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       resizable: true
     },
     form: {
-      handler: FFRPGItemSheet.onSubmit,
       submitOnChange: true,
       closeOnSubmit: false
     }
@@ -41,6 +40,7 @@ export class FFRPGItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     const selectOptions = (source, selected) => Object.entries(source).map(([key, label]) => ({ key, label, selected: key === selected }));
     return {
       ...context,
+      item: this.item,
       system,
       jobOptions,
       categoryOptions,
@@ -75,12 +75,16 @@ export class FFRPGItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     if (action === "roll-item") await this.item.roll();
   }
 
-  static async onSubmit(event, form, formData) {
-    const data = foundry.utils.flattenObject(formData.object);
+  _processFormData(event, form, formData) {
+    const data = { ...formData.object };
     for (const key of Object.keys(data)) {
       if (!key || key === "undefined") delete data[key];
     }
-    if (this.document.type === "equipment" && !Object.hasOwn(data, "system.equipped")) data["system.equipped"] = false;
-    await this.document.update(data);
+    const submitData = foundry.utils.expandObject(data);
+    if (this.document.type === "equipment") {
+      submitData.system ??= {};
+      if (!("equipped" in submitData.system)) submitData.system.equipped = false;
+    }
+    return submitData;
   }
 }
