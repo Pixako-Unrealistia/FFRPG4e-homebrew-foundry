@@ -897,7 +897,7 @@ function adventureDocs() {
 
 function progressionDocs() {
   const entries = [
-    ["Level Advancement", "Increase stats through earned milestones. Character level remains the sum of stat levels derived from Earth, Air, Fire, and Water."],
+    ["Level Advancement", "Increase character level directly through earned milestones. Earth, Air, Fire, and Water still provide stat levels for action scaling."],
     ["Job Advancement", "A character can advance their primary or secondary job after meaningful use, training, or chapter completion."],
     ["Magicite Growth", "Equipped magicite grants a focused stat direction and unlocks related spell training after practice or combat."],
     ["Blue Magic Learning", "A Blue Mage can learn monster techniques after seeing, surviving, or analyzing the technique."],

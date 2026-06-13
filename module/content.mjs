@@ -1,6 +1,6 @@
 import { FFRPG4E } from "./config.mjs";
 
-export const CONTENT_VERSION = "0.3.4";
+export const CONTENT_VERSION = "0.3.6";
 const SYSTEM_ID = "ffrpg4e-homebrew-foundry";
 const PACK_SOURCES = [
   { name: "Homebrew Jobs", type: "Item", path: "packs/homebrew-jobs.db" },

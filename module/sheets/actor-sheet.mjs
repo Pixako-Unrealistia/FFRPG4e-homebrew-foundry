@@ -65,10 +65,46 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         selected: option.key === system.elements[key]
       }))
     }));
+    const itemTypeLabels = {
+      job: "Job",
+      ability: "Ability",
+      spell: "Spell",
+      equipment: "Equipment"
+    };
+    const itemRows = this.actor.items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      img: item.img,
+      type: item.type,
+      typeLabel: itemTypeLabels[item.type] || item.type,
+      system: item.system,
+      rollLabel: item.type === "spell" ? "Cast" : item.type === "ability" ? "Roll" : "Use",
+      canRoll: ["ability", "spell"].includes(item.type) || (item.type === "equipment" && item.system.slot === "weapon"),
+      canEquip: item.type === "equipment",
+      equipped: item.type === "equipment" && item.system.equipped
+    }));
+    const itemOrder = {
+      spell: 1,
+      ability: 2,
+      equipment: 3,
+      job: 4
+    };
+    const availableItems = game.items
+      .filter((item) => ["spell", "ability", "equipment", "job"].includes(item.type))
+      .map((item) => ({
+        id: item.id,
+        name: item.name,
+        type: item.type,
+        label: `${itemTypeLabels[item.type] || item.type} - ${item.name}`
+      }))
+      .sort((a, b) => (itemOrder[a.type] - itemOrder[b.type]) || a.name.localeCompare(b.name));
     const items = {
-      abilities: this.actor.items.filter((item) => item.type === "ability"),
-      spells: this.actor.items.filter((item) => item.type === "spell"),
-      equipment: this.actor.items.filter((item) => item.type === "equipment")
+      jobs: itemRows.filter((item) => item.type === "job"),
+      abilities: itemRows.filter((item) => item.type === "ability"),
+      spells: itemRows.filter((item) => item.type === "spell"),
+      equipment: itemRows.filter((item) => item.type === "equipment"),
+      other: itemRows.filter((item) => !["job", "ability", "spell", "equipment"].includes(item.type)),
+      all: itemRows
     };
     return {
       ...context,
@@ -80,7 +116,9 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       skillOptions,
       aiOptions,
       elementEntries,
-      items
+      items,
+      availableItems,
+      canManageItems: game.user.isGM
     };
   }
 
@@ -105,6 +143,17 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     if (action === "reset-actions") await this.actor.resetTurnActions();
     if (action === "apply-job-resources") await this.actor.applyJobResources();
     if (action === "roll-item") await this.actor.rollItem(button.dataset.itemId);
+    if (action === "add-owned-item") {
+      const itemId = this.element.querySelector("[data-add-owned-item]").value;
+      if (!itemId) return;
+      const source = game.items.get(itemId);
+      const data = source.toObject();
+      delete data._id;
+      await this.actor.createEmbeddedDocuments("Item", [data]);
+    }
+    if (action === "remove-owned-item") {
+      await this.actor.deleteEmbeddedDocuments("Item", [button.dataset.itemId]);
+    }
     if (action === "toggle-equipped") {
       const item = this.actor.items.get(button.dataset.itemId);
       await item.update({ "system.equipped": !item.system.equipped });
@@ -114,7 +163,7 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   _processFormData(event, form, formData) {
     const data = { ...formData.object };
     for (const key of Object.keys(data)) {
-      if (!key || key === "undefined" || key.startsWith("roll.")) delete data[key];
+      if (!key || key === "undefined" || key.startsWith("roll.") || key.startsWith("manage.")) delete data[key];
     }
     const submitData = foundry.utils.expandObject(data);
     submitData.system ??= {};

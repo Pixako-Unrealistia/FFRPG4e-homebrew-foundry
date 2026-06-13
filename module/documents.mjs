@@ -5,7 +5,7 @@ export class FFRPGActor extends Actor {
     const primary = CONFIG.FFRPG4E.jobs[system.jobs.primary];
     const secondary = CONFIG.FFRPG4E.jobs[system.jobs.secondary];
     const stats = {};
-    let level = 0;
+    let statTotalLevel = 0;
     for (const [key, stat] of Object.entries(system.stats)) {
       const statLevel = Math.floor(stat.value / 10);
       stats[key] = {
@@ -13,19 +13,25 @@ export class FFRPGActor extends Actor {
         value: stat.value,
         level: statLevel
       };
-      level += statLevel;
+      statTotalLevel += statLevel;
     }
+    const level = system.level;
     const equipment = this.items.filter((item) => item.type === "equipment" && item.system.equipped);
     const arm = equipment.reduce((total, item) => total + item.system.arm, system.combat.arm);
     const marm = equipment.reduce((total, item) => total + item.system.marm, system.combat.marm);
     let hpMax = 0;
     let mpMax = 0;
-    if (primary && secondary) {
-      hpMax = 10 + level * primary.hp + Math.floor(level * secondary.hp / 2);
-      mpMax = 5 + level * primary.mp + Math.floor(level * secondary.mp / 2);
+    if (primary) {
+      hpMax = 10 + level * primary.hp;
+      mpMax = 5 + level * primary.mp;
+      if (secondary) {
+        hpMax += Math.floor(level * secondary.hp / 2);
+        mpMax += Math.floor(level * secondary.mp / 2);
+      }
     }
     this.derived = {
       level,
+      statTotalLevel,
       stats,
       primaryJob: primary,
       secondaryJob: secondary,
@@ -94,13 +100,32 @@ export class FFRPGActor extends Actor {
 
   async rollBasicAttack() {
     const weapon = this.items.find((item) => item.type === "equipment" && item.system.equipped && item.system.slot === "weapon");
-    if (!weapon) {
-      ui.notifications.warn("Equip a weapon first.");
+    if (weapon) {
+      await this.rollCombatAction({
+        name: weapon.name,
+        data: weapon.system
+      });
+      return;
+    }
+    if (!this.derived.primaryJob) {
+      ui.notifications.warn("Choose a primary job first.");
       return;
     }
     await this.rollCombatAction({
-      name: weapon.name,
-      data: weapon.system
+      name: "Attack",
+      data: {
+        actionType: "quick",
+        offensiveStat: this.derived.primaryJob.weaponStat,
+        defensiveStat: this.derived.primaryJob.defenseStat,
+        difficulty: 40,
+        effect: "damage",
+        mpCost: 0,
+        hpCost: 0,
+        damageFactor: Math.max(1, Math.floor(this.derived.level / 3)),
+        damageStat: this.derived.primaryJob.weaponStat,
+        damageType: "physical",
+        element: "crush"
+      }
     });
   }
 
@@ -301,10 +326,6 @@ export class FFRPGActor extends Actor {
   async applyJobResources() {
     if (!this.derived.primaryJob) {
       ui.notifications.warn("Choose a primary job first.");
-      return;
-    }
-    if (!this.derived.secondaryJob) {
-      ui.notifications.warn("Choose a secondary job first.");
       return;
     }
     await this.update({

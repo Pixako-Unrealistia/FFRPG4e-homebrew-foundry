@@ -208,6 +208,13 @@
   align-items: end;
 }
 
+.ffrpg4e-sheet .owned-item-manager {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
 .ffrpg4e-sheet .item-list {
   display: grid;
   gap: 8px;
@@ -215,12 +222,36 @@
 
 .ffrpg4e-sheet .item-row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 32px minmax(0, 1fr) repeat(3, auto);
   gap: 8px;
   align-items: center;
   min-height: 34px;
   border-bottom: 1px solid var(--ff-line);
   padding-bottom: 6px;
+}
+
+.ffrpg4e-sheet .item-row img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border: 1px solid var(--ff-line);
+  border-radius: 4px;
+}
+
+.ffrpg4e-sheet .item-row span {
+  display: grid;
+  gap: 2px;
+}
+
+.ffrpg4e-sheet .item-row small {
+  color: var(--ff-muted);
+  font-size: 12px;
+}
+
+.ffrpg4e-sheet .empty {
+  margin: 0;
+  color: var(--ff-muted);
+  font-style: italic;
 }
 
 .ffrpg4e-sheet .jobs-list {
@@ -251,7 +282,9 @@
 @media (max-width: 720px) {
   .ffrpg4e-sheet .grid.two,
   .ffrpg4e-sheet .sheet-header,
-  .ffrpg4e-sheet .challenge-row {
+  .ffrpg4e-sheet .challenge-row,
+  .ffrpg4e-sheet .owned-item-manager,
+  .ffrpg4e-sheet .item-row {
     grid-template-columns: 1fr;
   }
 }

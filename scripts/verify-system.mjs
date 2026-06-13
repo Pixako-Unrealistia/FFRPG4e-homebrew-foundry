@@ -49,6 +49,25 @@ globalThis.foundry = {
 async function verifySheetSubmits() {
   const { FFRPGActorSheet } = await import("../module/sheets/actor-sheet.mjs");
   const { FFRPGItemSheet } = await import("../module/sheets/item-sheet.mjs");
+  const createdItems = [];
+  const deletedItems = [];
+  globalThis.game = {
+    items: {
+      get(id) {
+        if (id !== "world-spell") return null;
+        return {
+          toObject() {
+            return {
+              _id: "world-spell",
+              name: "Fire",
+              type: "spell",
+              system: {}
+            };
+          }
+        };
+      }
+    }
+  };
   const actorSubmit = FFRPGActorSheet.prototype._processFormData.call({
     document: {
       type: "character"
@@ -58,8 +77,10 @@ async function verifySheetSubmits() {
       name: "Zane Greyford",
       "roll.skill": "acrobatics",
       "roll.difficulty": 30,
+      "system.level": 7,
       "system.gil": 25,
       "system.combat.actions.quickUsed": true,
+      "manage.itemId": "abc123",
       undefined: "invalid"
     }
   });
@@ -74,14 +95,61 @@ async function verifySheetSubmits() {
       undefined: "invalid"
     }
   });
+  await FFRPGActorSheet.prototype.onAction.call({
+    element: {
+      querySelector() {
+        return { value: "world-spell" };
+      }
+    },
+    actor: {
+      createEmbeddedDocuments(type, items) {
+        createdItems.push({ type, items });
+      },
+      deleteEmbeddedDocuments(type, ids) {
+        deletedItems.push({ type, ids });
+      }
+    }
+  }, {
+    preventDefault() {},
+    currentTarget: {
+      dataset: {
+        action: "add-owned-item"
+      }
+    }
+  });
+  await FFRPGActorSheet.prototype.onAction.call({
+    element: {},
+    actor: {
+      createEmbeddedDocuments(type, items) {
+        createdItems.push({ type, items });
+      },
+      deleteEmbeddedDocuments(type, ids) {
+        deletedItems.push({ type, ids });
+      }
+    }
+  }, {
+    preventDefault() {},
+    currentTarget: {
+      dataset: {
+        action: "remove-owned-item",
+        itemId: "owned-spell"
+      }
+    }
+  });
   assert(!Object.hasOwn(actorSubmit, "roll"), "Actor submit leaked roll fields.");
+  assert(!Object.hasOwn(actorSubmit, "manage"), "Actor submit leaked management fields.");
   assert(!Object.hasOwn(actorSubmit, "undefined"), "Actor submit leaked undefined key.");
   assert(!Object.hasOwn(itemSubmit, "undefined"), "Item submit leaked undefined key.");
+  assert(actorSubmit.system.level === 7, "Actor level update missing.");
   assert(actorSubmit.system.combat.defeated === false, "Actor KO checkbox default missing.");
   assert(actorSubmit.system.combat.actions.slowUsed === false, "Actor slow checkbox default missing.");
   assert(actorSubmit.system.combat.actions.reactionUsed === false, "Actor reaction checkbox default missing.");
   assert(itemSubmit.system.equipped === false, "Equipment checkbox default missing.");
-  return { actorSubmit, itemSubmit };
+  assert(createdItems[0].type === "Item", "Add owned item did not create embedded Item.");
+  assert(!Object.hasOwn(createdItems[0].items[0], "_id"), "Add owned item kept source item id.");
+  assert(deletedItems[0].type === "Item", "Remove owned item did not delete embedded Item.");
+  assert(deletedItems[0].ids[0] === "owned-spell", "Remove owned item used wrong id.");
+  return { actorSubmit, itemSubmit, createdItems, deletedItems };
 }
 
 function verifyPacks() {
@@ -132,12 +200,27 @@ function verifyTemplates() {
   const actorTemplate = fs.readFileSync("templates/actor/actor-sheet.hbs", "utf8");
   const enabledNameless = [...actorTemplate.matchAll(/<(input|select|textarea)\b(?=[^>]*)(?![^>]*\bdisabled\b)(?![^>]*\bname=)[^>]*>/g)].map(match => match[0]).filter(field => !field.includes("data-roll-"));
   const rollNamedFields = [...actorTemplate.matchAll(/name="roll\.[^"]+"/g)].map(match => match[0]);
+  const levelInput = actorTemplate.includes('name="system.level"');
+  const requiredActorText = [
+    "Secondary Optional",
+    "Add Owned Item",
+    "Jobs Owned",
+    "Abilities Owned",
+    "Spells Owned",
+    "Equipment Owned",
+    "Other Items Owned"
+  ];
+  const missingActorText = requiredActorText.filter(text => !actorTemplate.includes(text));
   assert(enabledNameless.length === 0, `Enabled nameless actor fields: ${enabledNameless.join(", ")}`);
   assert(rollNamedFields.length === 0, `Named roll fields: ${rollNamedFields.join(", ")}`);
+  assert(levelInput, "Actor sheet has no editable level input.");
   assert(!actorTemplate.includes("Homebrew Class List"), "Actor sheet still contains Homebrew Class List.");
+  assert(missingActorText.length === 0, `Actor sheet missing sections: ${missingActorText.join(", ")}`);
   return {
     actorEnabledNamelessFields: enabledNameless.length,
-    actorNamedRollFields: rollNamedFields.length
+    actorNamedRollFields: rollNamedFields.length,
+    actorLevelInput: levelInput,
+    actorInventorySections: requiredActorText.length
   };
 }
 

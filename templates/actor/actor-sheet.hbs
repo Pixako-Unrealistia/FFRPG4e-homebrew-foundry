@@ -5,7 +5,7 @@
       <input class="name" name="name" type="text" value="{{actor.name}}">
       <div class="line">
         <label>Level</label>
-        <input type="number" value="{{derived.level}}" disabled>
+        <input name="system.level" type="number" value="{{system.level}}" min="1">
       </div>
       <div class="line">
         <label>Gil</label>
@@ -28,7 +28,7 @@
         <option value="{{job.key}}" {{#if job.selectedPrimary}}selected{{/if}}>{{job.label}} - {{job.categoryLabel}}</option>
         {{/each}}
       </select>
-      <label>Secondary</label>
+      <label>Secondary Optional</label>
       <select name="system.jobs.secondary">
         <option value=""></option>
         {{#each jobOptions as |job|}}
@@ -129,36 +129,101 @@
       {{/each}}
     </div>
   </section>
+  {{#if canManageItems}}
+  <section class="panel">
+    <h2>Add Owned Item</h2>
+    <div class="owned-item-manager">
+      <select name="manage.itemId" data-add-owned-item>
+        <option value=""></option>
+        {{#each availableItems as |item|}}
+        <option value="{{item.id}}">{{item.label}}</option>
+        {{/each}}
+      </select>
+      <button type="button" data-action="add-owned-item">Add</button>
+    </div>
+  </section>
+  {{/if}}
   <section class="grid two">
     <div class="panel item-list">
-      <h2>Abilities</h2>
-      {{#each items.abilities as |item|}}
+      <h2>Jobs Owned</h2>
+      {{#each items.jobs as |item|}}
       <div class="item-row">
-        <span>{{item.name}}</span>
-        <button type="button" data-action="roll-item" data-item-id="{{item.id}}">Roll</button>
+        <img src="{{item.img}}" alt="{{item.name}}">
+        <span><strong>{{item.name}}</strong><small>{{item.typeLabel}}</small></span>
+        {{#if ../canManageItems}}
+        <button type="button" data-action="remove-owned-item" data-item-id="{{item.id}}">Remove</button>
+        {{/if}}
       </div>
+      {{else}}
+      <p class="empty">No owned job items.</p>
       {{/each}}
     </div>
     <div class="panel item-list">
-      <h2>Spells</h2>
+      <h2>Abilities Owned</h2>
+      {{#each items.abilities as |item|}}
+      <div class="item-row">
+        <img src="{{item.img}}" alt="{{item.name}}">
+        <span><strong>{{item.name}}</strong><small>{{item.system.actionType}} action</small></span>
+        <button type="button" data-action="roll-item" data-item-id="{{item.id}}">{{item.rollLabel}}</button>
+        {{#if ../canManageItems}}
+        <button type="button" data-action="remove-owned-item" data-item-id="{{item.id}}">Remove</button>
+        {{/if}}
+      </div>
+      {{else}}
+      <p class="empty">No owned abilities.</p>
+      {{/each}}
+    </div>
+  </section>
+  <section class="grid two">
+    <div class="panel item-list">
+      <h2>Spells Owned</h2>
       {{#each items.spells as |item|}}
       <div class="item-row">
-        <span>{{item.name}}</span>
-        <button type="button" data-action="roll-item" data-item-id="{{item.id}}">Cast</button>
+        <img src="{{item.img}}" alt="{{item.name}}">
+        <span><strong>{{item.name}}</strong><small>{{item.system.mpCost}} MP, {{item.system.element}}</small></span>
+        <button type="button" data-action="roll-item" data-item-id="{{item.id}}">{{item.rollLabel}}</button>
+        {{#if ../canManageItems}}
+        <button type="button" data-action="remove-owned-item" data-item-id="{{item.id}}">Remove</button>
+        {{/if}}
       </div>
+      {{else}}
+      <p class="empty">No owned spells.</p>
+      {{/each}}
+    </div>
+    <div class="panel item-list">
+      <h2>Equipment Owned</h2>
+      {{#each items.equipment as |item|}}
+      <div class="item-row">
+        <img src="{{item.img}}" alt="{{item.name}}">
+        <span><strong>{{item.name}}</strong><small>{{item.system.slot}}{{#if item.equipped}} equipped{{/if}}</small></span>
+        <button type="button" data-action="toggle-equipped" data-item-id="{{item.id}}">{{#if item.equipped}}Unequip{{else}}Equip{{/if}}</button>
+        {{#if item.canRoll}}
+        <button type="button" data-action="roll-item" data-item-id="{{item.id}}">{{item.rollLabel}}</button>
+        {{/if}}
+        {{#if ../canManageItems}}
+        <button type="button" data-action="remove-owned-item" data-item-id="{{item.id}}">Remove</button>
+        {{/if}}
+      </div>
+      {{else}}
+      <p class="empty">No owned equipment.</p>
       {{/each}}
     </div>
   </section>
   <section class="panel item-list">
-    <h2>Equipment</h2>
-    {{#each items.equipment as |item|}}
+    <h2>Other Items Owned</h2>
+    {{#each items.other as |item|}}
     <div class="item-row">
-      <span>{{item.name}} ({{item.system.slot}})</span>
-      <button type="button" data-action="toggle-equipped" data-item-id="{{item.id}}">{{#if item.system.equipped}}Unequip{{else}}Equip{{/if}}</button>
-      {{#if item.system.equipped}}
-      <button type="button" data-action="roll-item" data-item-id="{{item.id}}">Use</button>
+      <img src="{{item.img}}" alt="{{item.name}}">
+      <span><strong>{{item.name}}</strong><small>{{item.typeLabel}}</small></span>
+      {{#if item.canRoll}}
+      <button type="button" data-action="roll-item" data-item-id="{{item.id}}">{{item.rollLabel}}</button>
+      {{/if}}
+      {{#if ../canManageItems}}
+      <button type="button" data-action="remove-owned-item" data-item-id="{{item.id}}">Remove</button>
       {{/if}}
     </div>
+    {{else}}
+    <p class="empty">No other owned items.</p>
     {{/each}}
   </section>
   <section class="panel">
