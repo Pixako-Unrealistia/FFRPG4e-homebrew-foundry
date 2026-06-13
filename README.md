@@ -38,16 +38,23 @@ The system ships multiple compendium packs:
 - `FF6 Bosses`: 110 Actor documents
 - `FF6 Random Encounters`: 24 RollTable documents
 - `FF6 Boss Encounters`: 110 JournalEntry documents
-- `FF6 Encounter Scenes`: 32 Scene documents
 - `FF6 Loot Tables`: 385 RollTable documents
+- `FF6 Macros`: 6 Macro documents
+- `FF6 Cards`: 3 Cards documents
+- `FF6 Playlists`: 4 Playlist documents
+- `FF6 Adventures`: 8 Adventure documents
+- `FF6 Progression`: 8 JournalEntry documents
+- `FF6 Shops`: 12 RollTable documents
+- `FF6 Treasures`: 24 RollTable documents
+- `FF6 Vehicles`: 5 Actor documents
 
-Total compendium documents: 1312
+Total compendium documents: 1350
 
 Import path:
 
 `Game Settings > Configure Settings > FFRPG 4e Homebrew > Import Content`
 
-The importer can create or update item seeds and all pack source documents in the current world.
+The importer can create or update item seeds and world document pack sources. Adventure documents stay in their compendium pack.
 
 ## Seeded Content
 
@@ -84,11 +91,19 @@ Seeded item count:
 - Suggested HP and MP from selected primary and secondary jobs
 - Challenge rolls with skill rerolls
 - 3d10 initiative rolls
+- Initiative updates the Foundry Combat Tracker for selected tokens
 - Combat rolls using offensive stat vs difficulty plus target defensive stat
 - Damage roll digit added to base damage
 - Physical damage mitigated by ARM
 - Magical damage mitigated by MARM
+- Elemental weakness, resistance, immunity, and absorption
 - Damage, heal, revive, and status effects
+- Embedded item ActiveEffects apply to hit targets
+- Quick, slow, reaction, and free action economy
+- KO state at 0 HP with Combat Tracker defeated sync
+- NPC AI turn automation
+- Combat reward collection for gil, EXP, and AP
+- Combat chat buttons for applying effects and collecting rewards
 - HP and MP action costs
 - Equipped weapon, armor, and accessory support
 - Targeted damage and healing against selected tokens
