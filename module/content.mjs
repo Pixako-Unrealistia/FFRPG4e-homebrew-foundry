@@ -1,6 +1,6 @@
 import { FFRPG4E } from "./config.mjs";
 
-export const CONTENT_VERSION = "0.3.0";
+export const CONTENT_VERSION = "0.3.2";
 const SYSTEM_ID = "ffrpg4e-homebrew-foundry";
 const PACK_SOURCES = [
   { name: "Homebrew Jobs", type: "Item", path: "packs/homebrew-jobs.db" },
@@ -445,6 +445,8 @@ export async function seedWorldContent(options = {}) {
   if (!game.user.isGM) return;
   const current = game.settings.get(SYSTEM_ID, "contentVersion");
   if (current === CONTENT_VERSION && !options.force) return;
+  const includeActors = options.actors !== false;
+  const includeMacros = options.macros !== false;
   const items = buildWorldContent();
   const folders = {};
   for (const itemType of Object.keys(CONTENT_FOLDERS)) {
@@ -464,12 +466,18 @@ export async function seedWorldContent(options = {}) {
     }
   }
   if (createData.length > 0) await Item.createDocuments(createData);
+  let actors = null;
+  if (includeActors) actors = await importActorPackSourcesToWorld({ notify: false });
+  let macros = null;
+  if (includeMacros) macros = await importMacroPackSourcesToWorld({ notify: false });
   await game.settings.set(SYSTEM_ID, "contentVersion", CONTENT_VERSION);
-  ui.notifications.info(`Imported ${items.length} FFRPG 4e homebrew items.`);
+  ui.notifications.info(includeActors || includeMacros ? `Imported ${items.length} FFRPG 4e homebrew items and world sources.` : `Imported ${items.length} FFRPG 4e homebrew items.`);
   return {
     total: items.length,
     created: createData.length,
-    updated
+    updated,
+    actors,
+    macros
   };
 }
 
@@ -544,7 +552,7 @@ export async function importPackSourcesToWorld() {
   return result;
 }
 
-export async function importActorPackSourcesToWorld() {
+export async function importActorPackSourcesToWorld(options = {}) {
   if (!game.user.isGM) return;
   const result = {};
   let total = 0;
@@ -560,6 +568,23 @@ export async function importActorPackSourcesToWorld() {
     };
     total += documents.length;
   }
-  ui.notifications.info(`Imported ${total} FFRPG 4e actors.`);
+  if (options.notify !== false) ui.notifications.info(`Imported ${total} FFRPG 4e actors.`);
+  return result;
+}
+
+export async function importMacroPackSourcesToWorld(options = {}) {
+  if (!game.user.isGM) return;
+  const pack = PACK_SOURCES.find((pack) => pack.type === "Macro");
+  const folder = await getNamedFolder(pack.name, pack.type);
+  const documents = await loadPackSource(pack);
+  const imported = await upsertDocuments(pack.type, documents, folder.id);
+  const result = {
+    [pack.name]: {
+      total: documents.length,
+      created: imported.created,
+      updated: imported.updated
+    }
+  };
+  if (options.notify !== false) ui.notifications.info(`Imported ${documents.length} FFRPG 4e macros.`);
   return result;
 }

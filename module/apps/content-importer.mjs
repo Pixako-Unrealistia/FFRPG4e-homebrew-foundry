@@ -63,7 +63,7 @@ export class FFRPGContentImporter extends HandlebarsApplicationMixin(Application
 
   async importContent() {
     ui.notifications.info("Importing FFRPG item seeds.");
-    const result = await seedWorldContent({ force: true });
+    const result = await seedWorldContent({ force: true, actors: false, macros: false });
     if (result) ui.notifications.info(`Imported ${result.total} item seeds.`);
     await this.render();
   }

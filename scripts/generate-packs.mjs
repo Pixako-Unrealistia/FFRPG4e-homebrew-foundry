@@ -389,13 +389,13 @@ function journalDoc(scope, name, content) {
   };
 }
 
-function macroDoc(name, command) {
+function macroDoc(name, command, img = "icons/svg/dice-target.svg") {
   return {
     _id: idFor(`ff6.macro.${name}`),
     name,
     type: "script",
     author: null,
-    img: "icons/svg/dice-target.svg",
+    img,
     scope: "global",
     command,
     folder: null,
@@ -410,6 +410,10 @@ function macroDoc(name, command) {
       }
     }
   };
+}
+
+function macroCommand(functionName) {
+  return `const macros = await import("/systems/${systemId}/module/macros.mjs"); await macros.${functionName}();`;
 }
 
 function cardDoc(scope, name, cards) {
@@ -822,12 +826,27 @@ function lootTables(enemies) {
 
 function macroDocs() {
   return [
-    macroDoc("Roll FFRPG Challenge", "const stat = await Dialog.prompt({title: 'Challenge', content: '<p>Stat value?</p><input name=\"stat\" type=\"number\" value=\"50\" />', callback: html => Number(html.find('[name=stat]').val())}); const roll = await new Roll('3d10 + @stat', {stat}).roll({async: true}); roll.toMessage({speaker: ChatMessage.getSpeaker(), flavor: 'FFRPG Challenge'});"),
-    macroDoc("Roll Random Encounter", "const table = game.tables.find(t => t.name.includes('Encounter')); table.draw();"),
-    macroDoc("Roll Loot", "const table = game.tables.find(t => t.name.includes('Loot')); table.draw();"),
-    macroDoc("Blue Magic Learn Check", "const roll = await new Roll('3d10').roll({async: true}); roll.toMessage({speaker: ChatMessage.getSpeaker(), flavor: 'Blue Magic Learn Check'});"),
-    macroDoc("Time Magic Initiative Shift", "const roll = await new Roll('1d10').roll({async: true}); roll.toMessage({speaker: ChatMessage.getSpeaker(), flavor: 'Time Magic Initiative Shift'});"),
-    macroDoc("Shop Stock Roll", "const table = game.tables.find(t => t.name.includes('Shop')); table.draw();")
+    macroDoc("Roll FFRPG Challenge", macroCommand("rollChallenge")),
+    macroDoc("Roll Selected Initiative", macroCommand("rollSelectedInitiative")),
+    macroDoc("Roll Selected Basic Attack", macroCommand("rollSelectedBasicAttack"), "icons/svg/sword.svg"),
+    macroDoc("Reset Selected Actions", macroCommand("resetSelectedActions"), "icons/svg/clockwork.svg"),
+    macroDoc("Apply Damage To Selected", macroCommand("applyDamageToSelected"), "icons/svg/blood.svg"),
+    macroDoc("Heal Selected", macroCommand("healSelected"), "icons/svg/heal.svg"),
+    macroDoc("Heal Selected To Full", macroCommand("healSelectedToFull"), "icons/svg/hospital.svg"),
+    macroDoc("Toggle Selected KO", macroCommand("toggleSelectedKo"), "icons/svg/skull.svg"),
+    macroDoc("Roll Random Encounter", macroCommand("rollRandomEncounter")),
+    macroDoc("Choose Random Encounter", macroCommand("chooseRandomEncounter")),
+    macroDoc("Roll Loot", macroCommand("rollLoot")),
+    macroDoc("Choose Loot Table", macroCommand("chooseLootTable")),
+    macroDoc("Shop Stock Roll", macroCommand("rollShopStock")),
+    macroDoc("Roll Treasure", macroCommand("rollTreasure")),
+    macroDoc("Blue Magic Learn Check", macroCommand("blueMagicLearnCheck"), "icons/svg/ice-aura.svg"),
+    macroDoc("Time Magic Initiative Shift", macroCommand("timeMagicInitiativeShift"), "icons/svg/clockwork.svg"),
+    macroDoc("Open Playable Characters", macroCommand("openPlayableCharacters"), "icons/svg/mystery-man.svg"),
+    macroDoc("Open Enemies", macroCommand("openEnemies"), "icons/svg/mystery-man.svg"),
+    macroDoc("Open Bosses", macroCommand("openBosses"), "icons/svg/bones.svg"),
+    macroDoc("Open Spells", macroCommand("openSpells"), "icons/svg/explosion.svg"),
+    macroDoc("Open Equipment", macroCommand("openEquipment"), "icons/svg/sword.svg")
   ];
 }
 

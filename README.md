@@ -6,7 +6,7 @@ Changes are made to specifically tailor for final fantasy 6 content.
 
 ## Status
 
-- System version: `0.3.0`
+- System version: `0.3.2`
 - Foundry target: v14
 - Latest Foundry release checked during setup: v14 build 364, June 10, 2026
 - System id: `ffrpg4e-homebrew-foundry`
@@ -39,7 +39,7 @@ The system ships multiple compendium packs:
 - `FF6 Random Encounters`: 24 RollTable documents
 - `FF6 Boss Encounters`: 110 JournalEntry documents
 - `FF6 Loot Tables`: 385 RollTable documents
-- `FF6 Macros`: 6 Macro documents
+- `FF6 Macros`: 21 Macro documents
 - `FF6 Cards`: 3 Cards documents
 - `FF6 Playlists`: 4 Playlist documents
 - `FF6 Adventures`: 8 Adventure documents
@@ -48,24 +48,30 @@ The system ships multiple compendium packs:
 - `FF6 Treasures`: 24 RollTable documents
 - `FF6 Vehicles`: 5 Actor documents
 
-Total compendium documents: 1350
+Total compendium documents: 1365
 
 Import path:
 
 `Game Settings > Configure Settings > FFRPG 4e Homebrew > Import Content`
 
-The importer can create or update item seeds and world document pack sources. Adventure documents stay in their compendium pack.
+The importer can create or update item seeds, actors, and world document pack sources. Adventure documents stay in their compendium pack.
 
 ## Seeded Content
 
-On first GM load in a world, the system creates or updates seeded items in separate folders:
+On first GM load in a world, the system creates or updates seeded items, actor pack sources, and macros in separate folders:
 
 - `FFRPG 4e Jobs`
 - `FFRPG 4e Abilities`
 - `FFRPG 4e Spells`
 - `FFRPG 4e Equipment`
+- `FF6 Playable Characters`
+- `FF6 Guests And Story Characters`
+- `FF6 Enemies`
+- `FF6 Bosses`
+- `FF6 Vehicles`
+- `FF6 Macros`
 
-Seed version: `0.3.0`
+Seed version: `0.3.2`
 
 Seeded item count:
 
@@ -74,6 +80,43 @@ Seeded item count:
 - Spells: 76
 - Equipment: 132
 - Total: 340
+
+Seeded actor count:
+
+- Playable Characters: 14
+- Guests And Story Characters: 22
+- Enemies: 275
+- Bosses: 110
+- Vehicles: 5
+- Total: 426
+
+Seeded macro count:
+
+- Macros: 21
+
+## Macros
+
+- `Roll FFRPG Challenge`
+- `Roll Selected Initiative`
+- `Roll Selected Basic Attack`
+- `Reset Selected Actions`
+- `Apply Damage To Selected`
+- `Heal Selected`
+- `Heal Selected To Full`
+- `Toggle Selected KO`
+- `Roll Random Encounter`
+- `Choose Random Encounter`
+- `Roll Loot`
+- `Choose Loot Table`
+- `Shop Stock Roll`
+- `Roll Treasure`
+- `Blue Magic Learn Check`
+- `Time Magic Initiative Shift`
+- `Open Playable Characters`
+- `Open Enemies`
+- `Open Bosses`
+- `Open Spells`
+- `Open Equipment`
 
 ## Actor Types
 
