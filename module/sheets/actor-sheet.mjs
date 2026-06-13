@@ -53,6 +53,24 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       statLabel: CONFIG.FFRPG4E.stats[skill.stat],
       value: system.skills[key]
     }));
+    const aiOptions = Object.entries(CONFIG.FFRPG4E.aiTypes).map(([key, label]) => ({
+      key,
+      label,
+      selected: key === system.combat.ai
+    }));
+    const affinityOptions = Object.entries(CONFIG.FFRPG4E.elementAffinities).map(([key, label]) => ({
+      key,
+      label
+    }));
+    const elementEntries = Object.entries(CONFIG.FFRPG4E.elements).map(([key, label]) => ({
+      key,
+      label,
+      value: system.elements[key],
+      options: affinityOptions.map((option) => ({
+        ...option,
+        selected: option.key === system.elements[key]
+      }))
+    }));
     const items = {
       abilities: this.actor.items.filter((item) => item.type === "ability"),
       spells: this.actor.items.filter((item) => item.type === "spell"),
@@ -66,6 +84,8 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       categories,
       statEntries,
       skillOptions,
+      aiOptions,
+      elementEntries,
       items
     };
   }
@@ -88,6 +108,7 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     }
     if (action === "roll-initiative") await this.actor.rollInitiativeDice();
     if (action === "basic-attack") await this.actor.rollBasicAttack();
+    if (action === "reset-actions") await this.actor.resetTurnActions();
     if (action === "apply-job-resources") await this.actor.applyJobResources();
     if (action === "roll-item") await this.actor.rollItem(button.dataset.itemId);
     if (action === "toggle-equipped") {
@@ -97,6 +118,9 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   }
 
   static async onSubmit(event, form, formData) {
+    for (const key of ["system.combat.defeated", "system.combat.actions.quickUsed", "system.combat.actions.slowUsed", "system.combat.actions.reactionUsed"]) {
+      if (!Object.hasOwn(formData.object, key)) formData.object[key] = false;
+    }
     await this.document.update(formData.object);
   }
 }

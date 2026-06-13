@@ -40,3 +40,27 @@ Hooks.once("init", () => {
 Hooks.once("ready", async () => {
   await seedWorldContent();
 });
+
+Hooks.on("renderChatMessageHTML", (message, html) => {
+  for (const button of html.querySelectorAll("[data-ffrpg-action]")) {
+    button.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const action = event.currentTarget.dataset.ffrpgAction;
+      if (action === "apply-effects") await FFRPGActor.applyMessageEffects(message);
+      if (action === "collect-rewards") await FFRPGActor.collectCombatRewards(message);
+    });
+  }
+});
+
+Hooks.on("updateCombat", async (combat, changed) => {
+  if (!game.user.isGM) return;
+  if (!("turn" in changed) && !("round" in changed)) return;
+  const combatant = combat.combatant;
+  const actor = combatant?.actor;
+  if (!actor) return;
+  await actor.resetTurnActions();
+  if (actor.type === "npc" && actor.system.combat.ai !== "manual" && !actor.system.combat.defeated) {
+    await actor.runAiTurn();
+    await combat.nextTurn();
+  }
+});

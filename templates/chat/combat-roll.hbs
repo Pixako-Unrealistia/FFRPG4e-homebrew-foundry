@@ -7,6 +7,8 @@
     <dd>{{lookup elements data.element}}</dd>
     <dt>Damage Type</dt>
     <dd>{{lookup damageTypes data.damageType}}</dd>
+    <dt>Action</dt>
+    <dd>{{data.actionType}}</dd>
     <dt>Base Damage</dt>
     <dd>{{baseDamage}}</dd>
     <dt>Roll Digit</dt>
@@ -17,10 +19,14 @@
   {{#if targets.length}}
   <ol>
     {{#each targets as |target|}}
-    <li>{{target.name}}: {{#if target.hit}}{{#if target.finalHealing}}{{target.finalHealing}} HP restored{{else}}{{#if target.finalDamage}}{{target.finalDamage}} HP lost{{else}}Effect applied{{/if}}{{/if}}{{else}}Miss{{/if}}</li>
+    <li>{{target.name}}: {{#if target.hit}}{{#if target.finalHealing}}{{target.finalHealing}} HP restored{{else}}{{#if target.finalDamage}}{{target.finalDamage}} HP lost{{else}}Effect applied{{/if}}{{/if}} ({{lookup ../elementAffinities target.elementResult}}){{#if target.appliedEffects.length}} [{{target.appliedEffects}}]{{/if}}{{else}}Miss{{/if}}</li>
     {{/each}}
   </ol>
   {{else}}
   <p>No targets selected.</p>
   {{/if}}
+  <div class="chat-actions">
+    {{#if effectButton}}<button type="button" data-ffrpg-action="apply-effects">Apply Effects</button>{{/if}}
+    {{#if rewardButton}}<button type="button" data-ffrpg-action="collect-rewards">Collect Rewards</button>{{/if}}
+  </div>
 </div>

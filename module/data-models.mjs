@@ -47,7 +47,32 @@ class ActorDataModel extends foundry.abstract.TypeDataModel {
       combat: new SchemaField({
         arm: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
         marm: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
-        statuses: new StringField({ required: true, blank: true, initial: "" })
+        statuses: new StringField({ required: true, blank: true, initial: "" }),
+        defeated: new BooleanField({ required: true, initial: false }),
+        ai: new StringField({ required: true, blank: true, initial: "manual" }),
+        actions: new SchemaField({
+          quickUsed: new BooleanField({ required: true, initial: false }),
+          slowUsed: new BooleanField({ required: true, initial: false }),
+          reactionUsed: new BooleanField({ required: true, initial: false })
+        }),
+        rewards: new SchemaField({
+          exp: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
+          ap: new NumberField({ required: true, integer: true, min: 0, initial: 0 })
+        })
+      }),
+      elements: new SchemaField({
+        crush: new StringField({ required: true, blank: true, initial: "normal" }),
+        puncture: new StringField({ required: true, blank: true, initial: "normal" }),
+        cut: new StringField({ required: true, blank: true, initial: "normal" }),
+        fire: new StringField({ required: true, blank: true, initial: "normal" }),
+        ice: new StringField({ required: true, blank: true, initial: "normal" }),
+        lightning: new StringField({ required: true, blank: true, initial: "normal" }),
+        air: new StringField({ required: true, blank: true, initial: "normal" }),
+        earth: new StringField({ required: true, blank: true, initial: "normal" }),
+        water: new StringField({ required: true, blank: true, initial: "normal" }),
+        bio: new StringField({ required: true, blank: true, initial: "normal" }),
+        light: new StringField({ required: true, blank: true, initial: "normal" }),
+        shadow: new StringField({ required: true, blank: true, initial: "normal" })
       })
     };
   }
@@ -137,6 +162,7 @@ export class EquipmentDataModel extends ItemDataModel {
       ...super.defineSchema(),
       slot: new StringField({ required: true, blank: true, initial: "weapon" }),
       equipped: new BooleanField({ required: true, initial: false }),
+      actionType: new StringField({ required: true, blank: true, initial: "quick" }),
       level: new NumberField({ required: true, integer: true, min: 1, initial: 1 }),
       cost: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
       arm: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),

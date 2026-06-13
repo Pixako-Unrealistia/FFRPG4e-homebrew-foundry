@@ -13,8 +13,15 @@ const PACK_SOURCES = [
   { name: "FF6 Bosses", type: "Actor", path: "packs/ff6-bosses.db" },
   { name: "FF6 Random Encounters", type: "RollTable", path: "packs/ff6-random-encounters.db" },
   { name: "FF6 Boss Encounters", type: "JournalEntry", path: "packs/ff6-boss-encounters.db" },
-  { name: "FF6 Encounter Scenes", type: "Scene", path: "packs/ff6-encounter-scenes.db" },
-  { name: "FF6 Loot Tables", type: "RollTable", path: "packs/ff6-loot-tables.db" }
+  { name: "FF6 Loot Tables", type: "RollTable", path: "packs/ff6-loot-tables.db" },
+  { name: "FF6 Macros", type: "Macro", path: "packs/ff6-macros.db" },
+  { name: "FF6 Cards", type: "Cards", path: "packs/ff6-cards.db" },
+  { name: "FF6 Playlists", type: "Playlist", path: "packs/ff6-playlists.db" },
+  { name: "FF6 Adventures", type: "Adventure", path: "packs/ff6-adventures.db", worldImport: false },
+  { name: "FF6 Progression", type: "JournalEntry", path: "packs/ff6-progression.db" },
+  { name: "FF6 Shops", type: "RollTable", path: "packs/ff6-shops.db" },
+  { name: "FF6 Treasures", type: "RollTable", path: "packs/ff6-treasures.db" },
+  { name: "FF6 Vehicles", type: "Actor", path: "packs/ff6-vehicles.db" }
 ];
 
 const abilityProfiles = {
@@ -370,6 +377,7 @@ function makeEquipmentItems() {
     system: {
       slot,
       equipped: false,
+      actionType: "quick",
       level,
       cost,
       arm,
@@ -476,10 +484,12 @@ function cloneDocumentData(data, folderId) {
 async function upsertDocuments(type, documents, folderId) {
   const tools = {
     Actor: { collection: game.actors, documentClass: Actor },
+    Cards: { collection: game.cards, documentClass: Cards },
     Item: { collection: game.items, documentClass: Item },
     JournalEntry: { collection: game.journal, documentClass: JournalEntry },
+    Macro: { collection: game.macros, documentClass: Macro },
+    Playlist: { collection: game.playlists, documentClass: Playlist },
     RollTable: { collection: game.tables, documentClass: RollTable },
-    Scene: { collection: game.scenes, documentClass: Scene }
   };
   const collection = tools[type].collection;
   const documentClass = tools[type].documentClass;
@@ -509,6 +519,7 @@ export async function importPackSourcesToWorld() {
   const result = {};
   let total = 0;
   for (const pack of PACK_SOURCES) {
+    if (pack.worldImport === false) continue;
     const folder = await getNamedFolder(pack.name, pack.type);
     const documents = await loadPackSource(pack);
     const imported = await upsertDocuments(pack.type, documents, folder.id);

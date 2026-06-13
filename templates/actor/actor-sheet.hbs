@@ -15,6 +15,7 @@
     <div class="sheet-actions">
       <button type="button" data-action="roll-initiative">Initiative</button>
       <button type="button" data-action="basic-attack">Attack</button>
+      <button type="button" data-action="reset-actions">Reset Actions</button>
     </div>
   </header>
   <section class="grid two">
@@ -75,6 +76,37 @@
         <span>=</span>
         <input type="number" value="{{derived.marm}}" disabled>
       </div>
+    </div>
+  </section>
+  <section class="grid two">
+    <div class="panel">
+      <h2>Combat State</h2>
+      <label>KO<input name="system.combat.defeated" type="checkbox" {{#if system.combat.defeated}}checked{{/if}}></label>
+      <label>AI<select name="system.combat.ai">{{#each aiOptions as |ai|}}<option value="{{ai.key}}" {{#if ai.selected}}selected{{/if}}>{{ai.label}}</option>{{/each}}</select></label>
+      <div class="skills-grid">
+        <label>Quick Used<input name="system.combat.actions.quickUsed" type="checkbox" {{#if system.combat.actions.quickUsed}}checked{{/if}}></label>
+        <label>Slow Used<input name="system.combat.actions.slowUsed" type="checkbox" {{#if system.combat.actions.slowUsed}}checked{{/if}}></label>
+        <label>Reaction Used<input name="system.combat.actions.reactionUsed" type="checkbox" {{#if system.combat.actions.reactionUsed}}checked{{/if}}></label>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Rewards</h2>
+      <div class="resources">
+        <label>EXP</label>
+        <input name="system.combat.rewards.exp" type="number" value="{{system.combat.rewards.exp}}" min="0">
+        <span></span>
+        <span></span>
+        <label>AP</label>
+        <input name="system.combat.rewards.ap" type="number" value="{{system.combat.rewards.ap}}" min="0">
+      </div>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Elements</h2>
+    <div class="skills-grid">
+      {{#each elementEntries as |element|}}
+      <label>{{element.label}}<select name="system.elements.{{element.key}}">{{#each element.options as |option|}}<option value="{{option.key}}" {{#if option.selected}}selected{{/if}}>{{option.label}}</option>{{/each}}</select></label>
+      {{/each}}
     </div>
   </section>
   <section class="panel">

@@ -48,6 +48,20 @@ export const FFRPG4E = {
     revive: "Revive",
     status: "Status"
   },
+  elementAffinities: {
+    normal: "Normal",
+    weak: "Weak",
+    resist: "Resist",
+    immune: "Immune",
+    absorb: "Absorb"
+  },
+  aiTypes: {
+    manual: "Manual",
+    attacker: "Attacker",
+    caster: "Caster",
+    defender: "Defender",
+    healer: "Healer"
+  },
   actionTypes: {
     quick: "Quick",
     slow: "Slow",

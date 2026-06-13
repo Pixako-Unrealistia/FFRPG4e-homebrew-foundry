@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { FFRPG4E } from "../module/config.mjs";
 import { buildWorldContent } from "../module/content.mjs";
 
 const root = process.cwd();
@@ -59,15 +60,56 @@ const encounterAreas = [
   { name: "Kefka's Tower Core", min: 84, max: 255, terrain: "apocalyptic tower", tint: "#724b62" }
 ];
 
-const bossArenas = [
-  { name: "Narshe Defense Line", terrain: "snowfield barricades", tint: "#cddfe5" },
-  { name: "Opera House Rafters", terrain: "theater rigging", tint: "#7a3f52" },
-  { name: "Magitek Research Chamber", terrain: "reactor room", tint: "#49616d" },
-  { name: "Sealed Gate Bridge", terrain: "cracked stone bridge", tint: "#865744" },
-  { name: "Floating Continent Summit", terrain: "sky island summit", tint: "#817a9f" },
-  { name: "Eight Dragons' Lairs", terrain: "elemental arena", tint: "#735e50" },
-  { name: "Warring Triad Platforms", terrain: "divine battleground", tint: "#6a607a" },
-  { name: "Kefka's Final Tower", terrain: "apocalyptic ascent", tint: "#713d61" }
+const statusProfiles = {
+  Poison: { icon: "icons/magic/acid/dissolve-drip-droplet-smoke.webp", changes: [] },
+  Haste: { icon: "icons/magic/time/arrows-circling-green.webp", changes: [{ key: "system.stats.air.value", mode: 2, value: "10", priority: 20 }] },
+  Slow: { icon: "icons/magic/time/hourglass-brown-orange.webp", changes: [{ key: "system.stats.air.value", mode: 2, value: "-10", priority: 20 }] },
+  Stop: { icon: "icons/magic/time/clock-spinning-gold-pink.webp", changes: [{ key: "system.stats.air.value", mode: 2, value: "-30", priority: 20 }] },
+  Protect: { icon: "icons/magic/defensive/shield-barrier-glowing-blue.webp", changes: [{ key: "system.combat.arm", mode: 2, value: "10", priority: 20 }] },
+  Shell: { icon: "icons/magic/defensive/shield-barrier-flaming-diamond-blue.webp", changes: [{ key: "system.combat.marm", mode: 2, value: "10", priority: 20 }] },
+  Reflect: { icon: "icons/magic/defensive/barrier-shield-dome-blue-purple.webp", changes: [] },
+  Regen: { icon: "icons/magic/life/cross-beam-green.webp", changes: [] },
+  Berserk: { icon: "icons/magic/control/buff-strength-muscle-damage-red.webp", changes: [{ key: "system.stats.earth.value", mode: 2, value: "10", priority: 20 }] },
+  Imp: { icon: "icons/magic/control/debuff-chains-ropes-purple.webp", changes: [{ key: "system.stats.fire.value", mode: 2, value: "-10", priority: 20 }] },
+  Sleep: { icon: "icons/magic/control/silhouette-hold-change-blue.webp", changes: [{ key: "system.stats.air.value", mode: 2, value: "-20", priority: 20 }] },
+  Confuse: { icon: "icons/magic/control/hypnosis-mesmerism-eye.webp", changes: [] },
+  Vanish: { icon: "icons/magic/air/fog-gas-smoke-dense-gray.webp", changes: [{ key: "system.stats.air.value", mode: 2, value: "10", priority: 20 }] },
+  Float: { icon: "icons/magic/air/wind-vortex-swirl-blue.webp", changes: [{ key: "system.stats.air.value", mode: 2, value: "5", priority: 20 }] },
+  Reraise: { icon: "icons/magic/life/ankh-gold-blue.webp", changes: [] }
+};
+
+const adventureChapters = [
+  ["Narshe Opening", "Terra, Biggs, and Wedge break into Narshe and discover the frozen esper."],
+  ["Returners And Figaro", "The party reaches Figaro, joins the Returners, and escapes imperial pursuit."],
+  ["Three Scenario Split", "The campaign splits across Locke, Terra and Banon, and Sabin."],
+  ["Opera And Vector", "The party crosses the Opera House, reaches Vector, and enters the Magitek Factory."],
+  ["Sealed Gate And Floating Continent", "Espers break loose and the world changes at the Floating Continent."],
+  ["World Of Ruin", "The heroes regroup after the cataclysm and reclaim allies across the ruined world."],
+  ["Eight Dragons And Ancient Secrets", "Optional objectives cover the dragons, ancient castle, and hidden relics."],
+  ["Kefka's Tower", "The final multi-party assault against Kefka and the Warring Triad."]
+];
+
+const shopProfiles = [
+  ["Narshe Provisioner", ["Potion", "Sleeping Bag", "Leather Hat", "Leather Armor", "Dirk", "Buckler"]],
+  ["Figaro Armory", ["Auto Crossbow", "Noiseblaster", "Mythril Sword", "Mythril Shield", "Plumed Hat", "Leather Armor"]],
+  ["South Figaro Market", ["Mythril Knife", "Great Sword", "Metal Knuckle", "Heavy Shield", "Sprint Shoes", "Jeweled Ring"]],
+  ["Nikeah Ferry Vendor", ["Dagger", "Cotton Robe", "Plumed Hat", "Potion", "Tent", "Sprint Shoes"]],
+  ["Kohlingen Relics", ["Thief's Bracer", "Black Belt", "Barrier Ring", "Mythril Glove", "Fairy Ring", "Jeweled Ring"]],
+  ["Jidoor Fine Arms", ["Flametongue", "Icebrand", "Thunder Blade", "Cards", "Silk Robe", "Circlet"]],
+  ["Vector Arsenal", ["Drill", "Chainsaw", "Force Armor", "Gold Shield", "Diamond Helm", "Barrier Ring"]],
+  ["Thamasa Curios", ["Flame Rod", "Ice Rod", "Thunder Rod", "Magus Hat", "Mystery Veil", "Reflect Ring"]],
+  ["Mobliz Relief Stock", ["Cotton Robe", "Green Beret", "Barrier Ring", "Potion", "Phoenix Down", "Tent"]],
+  ["Maranda Rebuilt Market", ["Crystal Sword", "Stout Spear", "Kaiser Knuckles", "Diamond Shield", "Diamond Helm", "Guard Bracelet"]],
+  ["Kefka's Tower Spoils", ["Ragnarok", "Lightbringer", "Paladin Shield", "Genji Armor", "Soul of Thamasa", "Master's Scroll"]],
+  ["Coliseum Prize Board", ["Ultima Weapon", "Fixed Dice", "Snow Scarf", "Minerva Bustier", "Celestriad", "Growth Egg"]]
+];
+
+const vehicleProfiles = [
+  ["Chocobo", "scout", "Fast overland travel mount.", 160, 20, 20, 60, 20, 30],
+  ["Magitek Armor", "magitekPilot", "Imperial walking armor platform.", 500, 120, 70, 30, 80, 40],
+  ["Blackjack", "gambler", "Setzer's first airship.", 900, 80, 60, 70, 50, 50],
+  ["Falcon", "engineer", "Restored airship for the World of Ruin.", 1200, 100, 80, 80, 60, 60],
+  ["Phantom Train", "oracle", "Haunted rail vehicle crossing the spirit world.", 1500, 120, 90, 40, 90, 90]
 ];
 
 function text(html) {
@@ -136,10 +178,30 @@ function actorSystem(data) {
     combat: {
       arm: data.arm,
       marm: data.marm,
-      statuses: data.statuses
+      statuses: data.statuses,
+      defeated: false,
+      ai: data.ai,
+      actions: {
+        quickUsed: false,
+        slowUsed: false,
+        reactionUsed: false
+      },
+      rewards: {
+        exp: data.exp,
+        ap: data.ap
+      }
     },
+    elements: elementAffinities(data.elementProfile),
     boss: data.boss
   };
+}
+
+function elementAffinities(profile) {
+  const elements = {};
+  for (const key of Object.keys(FFRPG4E.elements)) {
+    elements[key] = profile?.[key] || "normal";
+  }
+  return elements;
 }
 
 function actorDoc(scope, name, type, data) {
@@ -151,6 +213,25 @@ function actorDoc(scope, name, type, data) {
     type,
     img: data.img,
     system,
+    prototypeToken: {
+      name,
+      displayName: type === "character" ? 50 : 20,
+      actorLink: type === "character",
+      disposition: type === "character" ? 1 : -1,
+      bar1: {
+        attribute: "resources.hp"
+      },
+      bar2: {
+        attribute: "resources.mp"
+      },
+      texture: {
+        src: data.img,
+        scaleX: 1,
+        scaleY: 1
+      },
+      width: data.boss ? 2 : 1,
+      height: data.boss ? 2 : 1
+    },
     items: [],
     effects: [],
     folder: null,
@@ -174,7 +255,7 @@ function itemDoc(scope, item) {
     type: item.type,
     img: item.img,
     system: item.system,
-    effects: [],
+    effects: itemEffects(item),
     folder: null,
     sort: 0,
     ownership: {
@@ -182,6 +263,43 @@ function itemDoc(scope, item) {
     },
     flags: item.flags
   };
+}
+
+function activeEffectDoc(scope, name, profile) {
+  return {
+    _id: idFor(`${scope}.effect.${name}`),
+    name,
+    img: profile.icon,
+    type: "base",
+    system: {},
+    changes: profile.changes,
+    disabled: false,
+    duration: {},
+    transfer: false,
+    origin: null,
+    tint: null,
+    statuses: [name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")],
+    flags: {
+      [systemId]: {
+        source: "Final Fantasy VI",
+        sourceKey: `${scope}.effect.${name}`
+      }
+    }
+  };
+}
+
+function itemEffects(item) {
+  const names = [];
+  if (statusProfiles[item.name]) names.push(item.name);
+  if (item.name === "Mighty Guard") names.push("Protect", "Shell");
+  if (item.name === "White Wind") names.push("Regen");
+  if (item.name === "Bad Breath") names.push("Poison", "Confuse", "Sleep");
+  if (item.name === "Force Field") names.push("Shell");
+  if (item.name === "Transfusion") names.push("Reraise");
+  if (item.name === "Hermes Sandals") names.push("Haste");
+  if (item.name === "Reflect Ring") names.push("Reflect");
+  if (item.name === "Ribbon") names.push("Protect", "Shell");
+  return names.map((name) => activeEffectDoc(`homebrew.${item.type}.${item.name}`, name, statusProfiles[name]));
 }
 
 function resultDoc(scope, name, start, end) {
@@ -258,49 +376,15 @@ function journalDoc(scope, name, content) {
   };
 }
 
-function sceneDoc(scope, name, area, index) {
+function macroDoc(name, command) {
   return {
-    _id: idFor(`${scope}.${name}`),
+    _id: idFor(`ff6.macro.${name}`),
     name,
-    active: false,
-    navigation: false,
-    navOrder: index,
-    navName: name,
-    background: {
-      src: "",
-      tint: area.tint,
-      offsetX: 0,
-      offsetY: 0,
-      scaleX: 1,
-      scaleY: 1,
-      rotation: 0,
-      anchorX: 0.5,
-      anchorY: 0.5,
-      fit: "cover"
-    },
-    width: 2800,
-    height: 1800,
-    padding: 0.25,
-    grid: {
-      type: 1,
-      size: 100,
-      distance: 1,
-      units: "sq",
-      style: "solidLines",
-      thickness: 1,
-      color: "#000000",
-      alpha: 0.2
-    },
-    darkness: 0,
-    drawings: [],
-    tokens: [],
-    lights: [],
-    notes: [],
-    sounds: [],
-    templates: [],
-    tiles: [],
-    walls: [],
-    regions: [],
+    type: "script",
+    author: null,
+    img: "icons/svg/dice-target.svg",
+    scope: "global",
+    command,
     folder: null,
     sort: 0,
     ownership: {
@@ -309,8 +393,102 @@ function sceneDoc(scope, name, area, index) {
     flags: {
       [systemId]: {
         source: "Final Fantasy VI",
-        sourceKey: `${scope}.${name}`,
-        terrain: area.terrain
+        sourceKey: `ff6.macro.${name}`
+      }
+    }
+  };
+}
+
+function cardDoc(scope, name, cards) {
+  return {
+    _id: idFor(`${scope}.${name}`),
+    name,
+    type: "deck",
+    description: `<p>${name} for FFRPG 4e FF6 play.</p>`,
+    img: "icons/svg/card-joker.svg",
+    cards: cards.map((card, index) => ({
+      _id: idFor(`${scope}.${name}.${card}`),
+      name: card,
+      type: "base",
+      img: "icons/svg/card-joker.svg",
+      drawn: false,
+      face: 0,
+      faces: [
+        {
+          name: card,
+          img: "icons/svg/card-joker.svg"
+        }
+      ],
+      back: {
+        name: "Back",
+        img: "icons/svg/card-joker.svg"
+      },
+      value: index + 1,
+      suit: name,
+      sort: index * 100000,
+      ownership: {
+        default: -1
+      },
+      flags: {}
+    })),
+    width: 1,
+    height: 1,
+    rotation: 0,
+    displayCount: true,
+    folder: null,
+    sort: 0,
+    ownership: {
+      default: 0
+    },
+    flags: {
+      [systemId]: {
+        source: "Final Fantasy VI",
+        sourceKey: `${scope}.${name}`
+      }
+    }
+  };
+}
+
+function playlistDoc(name, mood) {
+  return {
+    _id: idFor(`ff6.playlist.${name}`),
+    name,
+    description: `<p>${mood}. Add licensed or original audio in your world.</p>`,
+    sounds: [],
+    mode: 0,
+    playing: false,
+    folder: null,
+    sort: 0,
+    ownership: {
+      default: 0
+    },
+    flags: {
+      [systemId]: {
+        source: "Final Fantasy VI",
+        sourceKey: `ff6.playlist.${name}`,
+        mood
+      }
+    }
+  };
+}
+
+function adventureDoc(name, summary) {
+  return {
+    _id: idFor(`ff6.adventure.${name}`),
+    name,
+    img: "icons/svg/book.svg",
+    description: `<p>${summary}</p>`,
+    caption: summary,
+    contents: [],
+    folder: null,
+    sort: 0,
+    ownership: {
+      default: 0
+    },
+    flags: {
+      [systemId]: {
+        source: "Final Fantasy VI",
+        sourceKey: `ff6.adventure.${name}`
       }
     }
   };
@@ -318,6 +496,34 @@ function sceneDoc(scope, name, area, index) {
 
 function anchorNames(fragment) {
   return [...fragment.matchAll(/<a[^>]*>([\s\S]*?)<\/a>/g)].map((match) => text(match[1])).filter((name) => name && name !== "None");
+}
+
+function elementKey(name) {
+  const lookup = {
+    fire: "fire",
+    ice: "ice",
+    lightning: "lightning",
+    wind: "air",
+    earth: "earth",
+    water: "water",
+    poison: "bio",
+    holy: "light"
+  };
+  return lookup[name.toLowerCase()];
+}
+
+function elementsFromSection(block, label) {
+  const match = block.match(new RegExp(`${label}[\\s\\S]*?<td class="bottomrow"[^>]*><div class="tablemaintext">([\\s\\S]*?)<\\/div>`));
+  if (!match) return [];
+  return [...match[1].matchAll(/(?:alt|title)=['"]([^'"]+)['"]/g)].map((entry) => elementKey(entry[1])).filter((key) => key);
+}
+
+function elementProfileFromBlock(block) {
+  const profile = {};
+  for (const key of elementsFromSection(block, "Elemental Immunities")) profile[key] = "immune";
+  for (const key of elementsFromSection(block, "Elemental Absorb")) profile[key] = "absorb";
+  for (const key of elementsFromSection(block, "Elemental Weakness")) profile[key] = "weak";
+  return profile;
 }
 
 function lootByEnemyFile(file) {
@@ -335,7 +541,8 @@ function lootByEnemyFile(file) {
     loot.set(`${bestiary}.${name}`, {
       stolen: itemMatch ? anchorNames(itemMatch[1]) : [],
       dropped: itemMatch ? anchorNames(itemMatch[2]) : [],
-      metamorph: metamorphMatch ? anchorNames(metamorphMatch[1]) : []
+      metamorph: metamorphMatch ? anchorNames(metamorphMatch[1]) : [],
+      elements: elementProfileFromBlock(block)
     });
   }
   return loot;
@@ -362,6 +569,7 @@ function parseEnemyFile(file) {
       name,
       bestiary,
       loot: details,
+      elementProfile: details ? details.elements : {},
       kind: text(match[3]),
       level: number(match[4]),
       hp: number(match[5]),
@@ -414,6 +622,10 @@ function enemyActor(enemy, boss) {
     arm: enemy.defense,
     marm: enemy.magicDefense,
     statuses: "",
+    ai: boss ? "caster" : "attacker",
+    exp: Math.max(1, enemy.level * (boss ? 25 : 8)),
+    ap: Math.max(1, Math.ceil(enemy.level / (boss ? 2 : 6))),
+    elementProfile: enemy.elementProfile,
     boss
   });
 }
@@ -465,6 +677,10 @@ function characterActor(character, playable) {
     arm: character.defense,
     marm: character.magicDefense,
     statuses: "",
+    ai: "manual",
+    exp: 0,
+    ap: 0,
+    elementProfile: {},
     boss: false
   });
 }
@@ -487,6 +703,10 @@ function extraGuestActor(guest) {
     arm: 10,
     marm: 10,
     statuses: "",
+    ai: "manual",
+    exp: 0,
+    ap: 0,
+    elementProfile: {},
     boss: false
   });
 }
@@ -561,12 +781,6 @@ function bossEncounterJournals(bosses) {
   });
 }
 
-function encounterScenes() {
-  const areaScenes = encounterAreas.map((area, index) => sceneDoc("ff6.encounterScene", `${area.name} Battlefield`, area, index));
-  const arenaScenes = bossArenas.map((area, index) => sceneDoc("ff6.encounterScene", `${area.name} Boss Arena`, area, encounterAreas.length + index));
-  return [...areaScenes, ...arenaScenes];
-}
-
 function lootResults(enemy) {
   const loot = enemy.loot ? enemy.loot : { stolen: [], dropped: [], metamorph: [] };
   const entries = [];
@@ -591,6 +805,101 @@ function lootTables(enemies) {
   ));
 }
 
+function macroDocs() {
+  return [
+    macroDoc("Roll FFRPG Challenge", "const stat = await Dialog.prompt({title: 'Challenge', content: '<p>Stat value?</p><input name=\"stat\" type=\"number\" value=\"50\" />', callback: html => Number(html.find('[name=stat]').val())}); const roll = await new Roll('3d10 + @stat', {stat}).roll({async: true}); roll.toMessage({speaker: ChatMessage.getSpeaker(), flavor: 'FFRPG Challenge'});"),
+    macroDoc("Roll Random Encounter", "const table = game.tables.find(t => t.name.includes('Encounter')); table.draw();"),
+    macroDoc("Roll Loot", "const table = game.tables.find(t => t.name.includes('Loot')); table.draw();"),
+    macroDoc("Blue Magic Learn Check", "const roll = await new Roll('3d10').roll({async: true}); roll.toMessage({speaker: ChatMessage.getSpeaker(), flavor: 'Blue Magic Learn Check'});"),
+    macroDoc("Time Magic Initiative Shift", "const roll = await new Roll('1d10').roll({async: true}); roll.toMessage({speaker: ChatMessage.getSpeaker(), flavor: 'Time Magic Initiative Shift'});"),
+    macroDoc("Shop Stock Roll", "const table = game.tables.find(t => t.name.includes('Shop')); table.draw();")
+  ];
+}
+
+function cardDocs() {
+  return [
+    cardDoc("ff6.cards", "Esper Deck", ["Ramuh", "Ifrit", "Shiva", "Siren", "Unicorn", "Maduin", "Bismarck", "Carbuncle", "Phantom", "Sraphim", "Golem", "ZoneSeek", "Fenrir", "Valigarmanda", "Phoenix", "Ragnarok", "Crusader", "Bahamut", "Odin", "Raiden"]),
+    cardDoc("ff6.cards", "Status Deck", Object.keys(statusProfiles)),
+    cardDoc("ff6.cards", "Encounter Modifier Deck", ["Ambush", "Pincer", "Back Attack", "Preemptive Strike", "Reinforcements", "Hazard", "Treasure Clue", "Blue Magic Opportunity", "Rare Steal", "No Escape"])
+  ];
+}
+
+function playlistDocs() {
+  return [
+    playlistDoc("Town And Castle Ambience", "Quiet city, castle, inn, and market loops"),
+    playlistDoc("Dungeon Ambience", "Caves, towers, ruins, factories, and haunted areas"),
+    playlistDoc("Battle Ambience", "Generic combat, boss combat, and urgent encounters"),
+    playlistDoc("World Travel Ambience", "Overworld, airship, ocean, and wasteland travel")
+  ];
+}
+
+function adventureDocs() {
+  return adventureChapters.map(([name, summary]) => adventureDoc(name, summary));
+}
+
+function progressionDocs() {
+  const entries = [
+    ["Level Advancement", "Increase stats through earned milestones. Character level remains the sum of stat levels derived from Earth, Air, Fire, and Water."],
+    ["Job Advancement", "A character can advance their primary or secondary job after meaningful use, training, or chapter completion."],
+    ["Magicite Growth", "Equipped magicite grants a focused stat direction and unlocks related spell training after practice or combat."],
+    ["Blue Magic Learning", "A Blue Mage can learn monster techniques after seeing, surviving, or analyzing the technique."],
+    ["Time Magic Mastery", "Time magic expands from initiative shifts into action economy, recovery, delay, and battlefield control."],
+    ["Esper Bonds", "Espers act as story rewards, summon permissions, and magicite progression anchors."],
+    ["Relic Mastery", "Relics can unlock signature combat modifications after repeated use."],
+    ["World Of Ruin Recovery", "Late-game progression emphasizes rebuilding, optional objectives, and character-specific closure."]
+  ];
+  return entries.map(([name, body]) => journalDoc("ff6.progression", name, `<h1>${name}</h1><p>${body}</p>`));
+}
+
+function namedResultDocs(scope, entries) {
+  const step = Math.floor(100 / entries.length);
+  return entries.map((entry, index) => {
+    const start = index * step + 1;
+    const end = index === entries.length - 1 ? 100 : (index + 1) * step;
+    return resultDoc(scope, entry, start, end);
+  });
+}
+
+function shopTables() {
+  return shopProfiles.map(([name, entries]) => tableDoc("ff6.shop", name, `<p>${name} inventory table.</p>`, namedResultDocs("ff6.shop", entries)));
+}
+
+function treasureTables() {
+  const equipment = buildWorldContent().filter((item) => item.type === "equipment").map((item) => item.name);
+  return encounterAreas.map((area, index) => {
+    const start = (index * 5) % equipment.length;
+    const entries = equipment.slice(start, start + 8);
+    if (entries.length < 8) entries.push(...equipment.slice(0, 8 - entries.length));
+    return tableDoc("ff6.treasure", `${area.name} Treasures`, `<p>${area.terrain} treasure table.</p>`, namedResultDocs("ff6.treasure", entries));
+  });
+}
+
+function vehicleActors() {
+  return vehicleProfiles.map(([name, job, biography, hp, mp, earth, air, fire, water]) => actorDoc("ff6.vehicle", name, "npc", {
+    img: "icons/svg/wing.svg",
+    source: "Final Fantasy VI",
+    biography: `<p>${biography}</p>`,
+    level: Math.max(1, Math.floor((earth + air + fire + water) / 40)),
+    gil: 0,
+    primary: job,
+    secondary: "engineer",
+    hp,
+    mp,
+    earth,
+    air,
+    fire,
+    water,
+    arm: Math.floor(earth / 4),
+    marm: Math.floor(water / 4),
+    statuses: "",
+    ai: "manual",
+    exp: 0,
+    ap: 0,
+    elementProfile: {},
+    boss: false
+  }));
+}
+
 function writePack(file, docs) {
   fs.mkdirSync(packs, { recursive: true });
   const body = docs.map((doc) => JSON.stringify(doc)).join("\n");
@@ -611,8 +920,15 @@ writePack("ff6-enemies.db", regularEnemies.map((enemy) => enemyActor(enemy, fals
 writePack("ff6-bosses.db", bosses.map((enemy) => enemyActor(enemy, true)));
 writePack("ff6-random-encounters.db", randomEncounterTables(regularEnemies));
 writePack("ff6-boss-encounters.db", bossEncounterJournals(bosses));
-writePack("ff6-encounter-scenes.db", encounterScenes());
 writePack("ff6-loot-tables.db", lootTables([...regularEnemies, ...bosses]));
+writePack("ff6-macros.db", macroDocs());
+writePack("ff6-cards.db", cardDocs());
+writePack("ff6-playlists.db", playlistDocs());
+writePack("ff6-adventures.db", adventureDocs());
+writePack("ff6-progression.db", progressionDocs());
+writePack("ff6-shops.db", shopTables());
+writePack("ff6-treasures.db", treasureTables());
+writePack("ff6-vehicles.db", vehicleActors());
 
 const characters = parseCharacterFiles();
 const playable = characters.filter((character) => playableNames.has(character.name));
@@ -631,6 +947,13 @@ console.log(JSON.stringify({
   bosses: bosses.length,
   randomEncounters: randomEncounterTables(regularEnemies).length,
   bossEncounters: bossEncounterJournals(bosses).length,
-  encounterScenes: encounterScenes().length,
-  lootTables: lootTables([...regularEnemies, ...bosses]).length
+  lootTables: lootTables([...regularEnemies, ...bosses]).length,
+  macros: macroDocs().length,
+  cards: cardDocs().length,
+  playlists: playlistDocs().length,
+  adventures: adventureDocs().length,
+  progression: progressionDocs().length,
+  shops: shopTables().length,
+  treasures: treasureTables().length,
+  vehicles: vehicleActors().length
 }, null, 2));
