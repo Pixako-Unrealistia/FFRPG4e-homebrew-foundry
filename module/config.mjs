@@ -68,6 +68,22 @@ export const FFRPG4E = {
     reaction: "Reaction",
     free: "Free"
   },
+  statuses: {
+    poison: "Poison",
+    blind: "Blind",
+    silence: "Silence",
+    sleep: "Sleep",
+    slow: "Slow",
+    haste: "Haste",
+    stop: "Stop",
+    petrify: "Petrify",
+    confuse: "Confuse",
+    berserk: "Berserk",
+    protect: "Protect",
+    shell: "Shell",
+    regen: "Regen",
+    doom: "Doom"
+  },
   equipmentSlots: {
     weapon: "Weapon",
     armor: "Armor",

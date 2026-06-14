@@ -250,6 +250,30 @@
   gap: 10px;
 }
 
+.ffrpg4e-sheet .status-toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.ffrpg4e-sheet .status-toggle {
+  background: #ffffff;
+  color: var(--ff-ink);
+  border-color: var(--ff-line);
+}
+
+.ffrpg4e-sheet .status-toggle.active {
+  background: var(--ff-accent);
+  color: var(--ff-accent-ink);
+  border-color: #5f4234;
+}
+
+.ffrpg4e-sheet .status-unknown {
+  margin: 10px 0 0;
+  color: var(--ff-ink);
+  font-weight: 700;
+}
+
 .ffrpg4e-sheet .challenge-row {
   display: grid;
   grid-template-columns: 1fr 96px auto;
@@ -266,7 +290,7 @@
 
 .ffrpg4e-sheet .owned-item-manager-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -277,9 +301,9 @@
 
 .ffrpg4e-sheet .item-row {
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) repeat(6, auto);
-  gap: 8px;
-  align-items: center;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 6px 8px;
+  align-items: start;
   min-height: 34px;
   border-bottom: 1px solid var(--ff-line);
   padding-bottom: 6px;
@@ -296,6 +320,12 @@
 .ffrpg4e-sheet .item-row span {
   display: grid;
   gap: 2px;
+  min-width: 0;
+}
+
+.ffrpg4e-sheet .item-row strong,
+.ffrpg4e-sheet .item-row small {
+  overflow-wrap: anywhere;
 }
 
 .ffrpg4e-sheet .item-row small {
@@ -304,10 +334,23 @@
 }
 
 .ffrpg4e-sheet .item-count {
-  min-width: 34px;
+  min-width: 30px;
   text-align: center;
   font-weight: 700;
   color: var(--ff-ink);
+}
+
+.ffrpg4e-sheet .item-actions {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.ffrpg4e-sheet .item-actions button {
+  min-height: 28px;
+  padding: 4px 8px;
 }
 
 .ffrpg4e-sheet .empty {
@@ -366,6 +409,25 @@
 
 .ffrpg4e-chat dd {
   margin: 0;
+}
+
+.ffrpg4e-chat .initiative-dice {
+  display: flex;
+  gap: 6px;
+  margin: 6px 0 8px;
+}
+
+.ffrpg4e-chat .initiative-dice span {
+  min-width: 28px;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #5f4234;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #241f1a;
+  font-weight: 700;
 }
 
 .ffrpg4e-importer {

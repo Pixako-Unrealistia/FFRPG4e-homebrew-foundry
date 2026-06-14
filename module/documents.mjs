@@ -69,10 +69,17 @@ export class FFRPGActor extends Actor {
 
   async rollInitiativeDice() {
     const roll = await new Roll("3d10").evaluate();
+    const dice = roll.dice[0].results.map((result) => result.result);
+    const content = await renderTemplate("systems/ffrpg4e-homebrew-foundry/templates/chat/initiative-roll.hbs", {
+      actor: this,
+      dice,
+      total: roll.total
+    });
     await this.updateCombatInitiative(roll.total);
     await roll.toMessage({
       speaker: ChatMessage.getSpeaker({ actor: this }),
-      flavor: "Initiative"
+      flavor: "Initiative",
+      content
     });
     return roll;
   }
@@ -103,7 +110,7 @@ export class FFRPGActor extends Actor {
     if (weapon) {
       await this.rollCombatAction({
         name: weapon.name,
-        data: weapon.system
+        data: this.weaponAttackData(weapon)
       });
       return;
     }
@@ -133,7 +140,7 @@ export class FFRPGActor extends Actor {
     const item = this.items.get(itemId);
     if (!item) return;
     if (item.type === "equipment" && item.system.slot === "weapon") {
-      await this.rollCombatAction({ name: item.name, data: item.system, item });
+      await this.rollCombatAction({ name: item.name, data: this.weaponAttackData(item), item });
       return;
     }
     if (item.type === "ability") {
@@ -141,6 +148,22 @@ export class FFRPGActor extends Actor {
       return;
     }
     if (item.type === "spell") await this.rollCombatAction({ name: item.name, data: item.system, item });
+  }
+
+  weaponAttackData(weapon) {
+    return {
+      actionType: "quick",
+      offensiveStat: weapon.system.offensiveStat,
+      defensiveStat: weapon.system.defensiveStat,
+      difficulty: weapon.system.difficulty,
+      effect: weapon.system.effect,
+      mpCost: 0,
+      hpCost: 0,
+      damageFactor: weapon.system.damageFactor,
+      damageStat: weapon.system.damageStat,
+      damageType: weapon.system.damageType,
+      element: weapon.system.element
+    };
   }
 
   async rollCombatAction(action) {

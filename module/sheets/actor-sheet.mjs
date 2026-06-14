@@ -67,6 +67,14 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     }));
     const primaryJob = CONFIG.FFRPG4E.jobs[system.jobs.primary];
     const secondaryJob = CONFIG.FFRPG4E.jobs[system.jobs.secondary];
+    const statuses = this.parseStatuses(system.combat.statuses);
+    const statusEntries = Object.entries(CONFIG.FFRPG4E.statuses).map(([key, label]) => ({
+      key,
+      label,
+      active: statuses.keys.has(key)
+    }));
+    const activeStatusLabels = statusEntries.filter((status) => status.active).map((status) => status.label);
+    const statusSummary = [...activeStatusLabels, ...statuses.unknown].join(", ");
     const summary = {
       primaryJob: primaryJob ? `${primaryJob.label} - ${CONFIG.FFRPG4E.jobCategories[primaryJob.category]}` : "None",
       secondaryJob: secondaryJob ? `${secondaryJob.label} - ${CONFIG.FFRPG4E.jobCategories[secondaryJob.category]}` : "None",
@@ -74,10 +82,9 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       quickAction: system.combat.actions.quickUsed ? "Used" : "Ready",
       slowAction: system.combat.actions.slowUsed ? "Used" : "Ready",
       reaction: system.combat.actions.reactionUsed ? "Used" : "Ready",
-      status: system.combat.defeated ? "KO" : "Active"
+      status: system.combat.defeated ? "KO" : statusSummary || "Active"
     };
     const itemTypeLabels = {
-      job: "Job",
       ability: "Ability",
       spell: "Spell",
       equipment: "Equipment"
@@ -90,18 +97,17 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       typeLabel: itemTypeLabels[item.type] || item.type,
       system: item.system,
       quantity: item.system.quantity,
-      rollLabel: item.type === "spell" ? "Cast" : item.type === "ability" ? "Roll" : "Use",
+      rollLabel: item.type === "spell" ? "Cast" : item.type === "ability" ? "Roll" : item.type === "equipment" && item.system.slot === "weapon" ? "Attack" : "Use",
       canRoll: ["ability", "spell"].includes(item.type) || (item.type === "equipment" && item.system.slot === "weapon"),
       canEquip: item.type === "equipment",
       equipped: item.type === "equipment" && item.system.equipped
     }));
     const availableItems = await this.getAvailableItems(itemTypeLabels);
     const items = {
-      jobs: itemRows.filter((item) => item.type === "job"),
       abilities: itemRows.filter((item) => item.type === "ability"),
       spells: itemRows.filter((item) => item.type === "spell"),
       equipment: itemRows.filter((item) => item.type === "equipment"),
-      other: itemRows.filter((item) => !["job", "ability", "spell", "equipment"].includes(item.type)),
+      other: itemRows.filter((item) => !["ability", "spell", "equipment", "job"].includes(item.type)),
       all: itemRows
     };
     return {
@@ -114,6 +120,8 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       skillOptions,
       aiOptions,
       elementEntries,
+      statusEntries,
+      unknownStatusText: statuses.unknown.join(", "),
       summary,
       items,
       availableItems,
@@ -121,10 +129,32 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     };
   }
 
+  parseStatuses(value) {
+    const keys = new Set();
+    const unknown = [];
+    const labels = Object.entries(CONFIG.FFRPG4E.statuses).reduce((result, [key, label]) => {
+      result.set(key.toLowerCase(), key);
+      result.set(label.toLowerCase(), key);
+      return result;
+    }, new Map());
+    for (const entry of String(value || "").split(/[\n,;|]+/).map((status) => status.trim()).filter(Boolean)) {
+      const key = labels.get(entry.toLowerCase());
+      if (key) keys.add(key);
+      if (!key) unknown.push(entry);
+    }
+    return { keys, unknown };
+  }
+
+  formatStatuses(keys, unknown) {
+    const known = Object.entries(CONFIG.FFRPG4E.statuses)
+      .filter(([key]) => keys.has(key))
+      .map(([, label]) => label);
+    return [...known, ...unknown].join(", ");
+  }
+
   async getAvailableItems(itemTypeLabels) {
-    const packNames = ["ff6-spells", "homebrew-abilities", "ff6-equipment", "homebrew-jobs"];
+    const packNames = ["ff6-spells", "homebrew-abilities", "ff6-equipment"];
     const items = {
-      job: [],
       ability: [],
       spell: [],
       equipment: []
@@ -172,6 +202,13 @@ export class FFRPGActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     if (action === "reset-actions") await this.actor.resetTurnActions();
     if (action === "apply-job-resources") await this.actor.applyJobResources();
     if (action === "roll-item") await this.actor.rollItem(button.dataset.itemId);
+    if (action === "toggle-status") {
+      const statuses = this.parseStatuses(this.actor.system.combat.statuses);
+      const key = button.dataset.statusKey;
+      if (statuses.keys.has(key)) statuses.keys.delete(key);
+      else statuses.keys.add(key);
+      await this.actor.update({ "system.combat.statuses": this.formatStatuses(statuses.keys, statuses.unknown) });
+    }
     if (action === "add-owned-item") {
       const uuid = this.element.querySelector(`[data-add-owned-item="${button.dataset.itemType}"]`).value;
       if (!uuid) return;

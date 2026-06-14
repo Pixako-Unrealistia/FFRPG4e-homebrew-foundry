@@ -58,7 +58,8 @@ export class FFRPGItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       isJob: this.item.type === "job",
       isAbility: this.item.type === "ability",
       isSpell: this.item.type === "spell",
-      isEquipment: this.item.type === "equipment"
+      isEquipment: this.item.type === "equipment",
+      isWeapon: this.item.type === "equipment" && system.slot === "weapon"
     };
   }
 
